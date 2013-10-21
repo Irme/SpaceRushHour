@@ -27,7 +27,7 @@ public class PuzzleActivity extends Activity{
 
 
 	    // Set the text view as the activity layout
-	   // setContentView(textView);
+	   // 
 		StringBuffer sb = new StringBuffer();
 		for (int i = 0; i < board.length; i++) {
 			for (int j = 0; j < board.length; j++) {
@@ -38,9 +38,9 @@ public class PuzzleActivity extends Activity{
 		
 	    // Create the text view
 	    TextView textView = new TextView(this);
-	    textView.setTextSize(400);
+	    textView.setTextSize(40);
 	    textView.setText(sb.toString());
-	    
+	    setContentView(textView);
 	    System.out.println("TEST");
 	}
 
