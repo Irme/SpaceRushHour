@@ -1,0 +1,11 @@
+
+TODO list
+	1. Make Home Screen (Done)
+	2. Start Activity Puzzle (Done)
+	3. Implement onThouch events/handlers
+	4. Collision detection for the bricks
+	5. Load xml file with puzzles (perhaps: http://www.androidhive.info/2011/11/android-xml-parsing-tutorial/)
+	6. Figure out what sort of objects the tiles should be (Done)??
+	7. See if it is possible to load textures onto the bricks
+
+	
