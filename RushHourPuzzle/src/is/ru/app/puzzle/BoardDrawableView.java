@@ -12,6 +12,7 @@ import android.graphics.drawable.ShapeDrawable;
 import android.util.DisplayMetrics;
 import android.view.MotionEvent;
 import android.view.View;
+import android.widget.Toast;
 
 public class BoardDrawableView extends View {
 	private List<ShapeDrawable> shapes = new ArrayList<ShapeDrawable>();
@@ -19,7 +20,8 @@ public class BoardDrawableView extends View {
 	private Rect m_rect = new Rect(); // Or other Shape
 	private Integer[] m_colors = { 0xff74AC23, 0xff74AB73, 0xff74DD26,
 			0xff74AC13, 0xff84AC13, 0xffffBC13, 0xff74AC00, 0xffAAAC73 };
-	
+	Toast toast = Toast.makeText(getContext(), "BOING", Toast.LENGTH_SHORT);
+
 	//private int[] m_colors = { Color.RED, Color.GREEN, Color.BLUE,
 	//		Color.LTGRAY, Color.CYAN, Color.YELLOW, Color.MAGENTA, Color.WHITE };
 	int heightScreen = 0;
@@ -107,7 +109,7 @@ public class BoardDrawableView extends View {
 
 			for (int j = 0; j < board[i].length; j++) {
 				if (board[i][j] == 1 || board[i][j] == 2) {
-					
+
 					m_rect.set(x, y, x + width, y + height);
 
 					m_shape.setBounds(m_rect);
@@ -164,19 +166,19 @@ public class BoardDrawableView extends View {
 	}
 
 	@Override
-/*	public boolean onTouchEvent(MotionEvent event) {
+	/*	public boolean onTouchEvent(MotionEvent event) {
 		if (event.getAction() == MotionEvent.ACTION_DOWN) {
 			int x = (int) event.getX();
 			int y = (int) event.getY();
-			
+
 			if(startX > 0 && startY > 0){
 				deltaX = startX - x;
 				deltaY = startY - y;
 			}
-			
+
 			startX = x;
 			startY = y;
-			
+
 			switch (event.getAction()) {
 			case MotionEvent.ACTION_DOWN:
 			//	m_shape.getPaint().setColor(Color.RED);
@@ -196,45 +198,75 @@ public class BoardDrawableView extends View {
 		}
 		return false;
 	}_*/
-	
+
 	public boolean onTouchEvent(MotionEvent event) {
 		final int x = (int)event.getX();
-        final int y = (int)event.getY();
+		final int y = (int)event.getY();
 		final ShapeDrawable bounds = isHitBlock(x, y);
-        switch( event.getAction() ){
-        case MotionEvent.ACTION_DOWN:
-            if(bounds != null){
-	            Rect rect = new Rect();
-	            rect.set(bounds.getBounds().left, bounds.getBounds().top, bounds.getBounds().right, bounds.getBounds().bottom);
-	            moving = rect.intersects(x, y, x+1, y+1);
-	            invalidate();
-            }
-            return true;
-        case MotionEvent.ACTION_MOVE:
-            if( bounds != null && moving ){
-                final int x_new = (int)event.getX();
-                final int y_new = (int)event.getY();
-	                if(bounds != null ){
-	                	if(bounds.getBounds() != null){
-			                int with = Math.abs(bounds.getBounds().left - bounds.getBounds().right);
-			                int height = Math.abs(bounds.getBounds().bottom - bounds.getBounds().top);
-			                //TODO: fix bounds
-			                bounds.setBounds(
-			                            x_new - with/2,
-			                            y_new - height/2,
-			                            x_new + with/2,
-			                            y_new + height/2);
-			                invalidate();
-	                	}
-	                } 
-                }
-            return true;
-        case MotionEvent.ACTION_UP:
-            moving = false;
-            return true;
-    }
-    return false;
-}        	  
+		switch( event.getAction() ){
+		case MotionEvent.ACTION_DOWN:
+			if(bounds != null){
+				Rect rect = new Rect();
+				rect.set(bounds.getBounds().left, bounds.getBounds().top, bounds.getBounds().right, bounds.getBounds().bottom);
+				moving = rect.intersects(x, y, x+1, y+1);
+				invalidate();
+			}
+			return true;
+		case MotionEvent.ACTION_MOVE:
+			if( bounds != null && moving ){
+				final int x_new = (int)event.getX();
+				final int y_new = (int)event.getY();
+				if(bounds != null ){
+					if(bounds.getBounds() != null){
+						int with = Math.abs(bounds.getBounds().left - bounds.getBounds().right);
+						int height = Math.abs(bounds.getBounds().bottom - bounds.getBounds().top);
+						//TODO: fix bounds
+						for (ShapeDrawable shape  : shapes){
+							if(collision(bounds, shape)){
+								moving = false;
+								bounds.invalidateSelf();
+							}
+							else{	
+								if(horizontal(bounds)){
+								bounds.setBounds(
+										x_new - with/2,
+										bounds.getBounds().top,
+										x_new + with/2,
+										bounds.getBounds().bottom);
+								invalidate();
+								}
+								else{
+									bounds.setBounds(
+											bounds.getBounds().left,
+											y_new - height/2,
+											bounds.getBounds().right,
+											y_new + height/2);
+									invalidate();
+									
+								}
+							}
+
+						}
+					} 
+				}
+			}
+			return true;
+		case MotionEvent.ACTION_UP:
+			moving = false;
+			return true;
+		}
+		return false;
+	}        
+	private boolean collision(ShapeDrawable rect1, ShapeDrawable rect2){
+		if(rect1.getBounds() != rect2.getBounds()){
+			int [] coor1 = {rect1.getBounds().bottom, rect1.getBounds().top, rect1.getBounds().right, rect1.getBounds().left};
+			int [] coor2 = {rect2.getBounds().bottom, rect2.getBounds().top, rect2.getBounds().right, rect2.getBounds().left};
+			
+
+		}
+		return false;
+
+	}
 
 	private ShapeDrawable isHitBlock(int x, int y) {
 		for (ShapeDrawable shape : shapes) {
@@ -244,5 +276,20 @@ public class BoardDrawableView extends View {
 			}
 		}
 		return null;
+	}
+	
+	/*
+	 * Simple method to see if a block is horizontally positioned or vertically.
+	 * returns true if it is horizontal.
+	 */
+	private boolean horizontal(ShapeDrawable rect1){
+		int diffh = Math.abs(rect1.getBounds().left - rect1.getBounds().right);
+		int diffv = Math.abs(rect1.getBounds().bottom - rect1.getBounds().top);
+		if(diffv > diffh){
+			return false;
+		} else{
+			return true;
+		}
+		
 	}
 }
