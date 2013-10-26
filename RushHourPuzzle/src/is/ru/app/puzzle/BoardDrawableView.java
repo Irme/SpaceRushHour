@@ -224,7 +224,6 @@ public class BoardDrawableView extends View {
 						for (ShapeDrawable shape  : shapes){
 							if(collision(bounds, shape)){
 								moving = false;
-								bounds.invalidateSelf();
 							}
 							else{	
 								if(horizontal(bounds)){
@@ -257,13 +256,15 @@ public class BoardDrawableView extends View {
 		}
 		return false;
 	}        
-	private boolean collision(ShapeDrawable rect1, ShapeDrawable rect2){
-		if(rect1.getBounds() != rect2.getBounds()){
-			int [] coor1 = {rect1.getBounds().bottom, rect1.getBounds().top, rect1.getBounds().right, rect1.getBounds().left};
-			int [] coor2 = {rect2.getBounds().bottom, rect2.getBounds().top, rect2.getBounds().right, rect2.getBounds().left};
+	@SuppressWarnings("static-access")
+	private boolean collision(ShapeDrawable shape1, ShapeDrawable shape2){
+		if(shape1.getBounds() != shape2.getBounds()){
+			Rect rect1 = new Rect(shape1.getBounds().left, shape1.getBounds().top, shape1.getBounds().right, shape1.getBounds().bottom);
+			Rect rect2 = new Rect(shape2.getBounds().left, shape2.getBounds().top, shape2.getBounds().right, shape2.getBounds().bottom);
 			
-
+			return rect1.intersects(rect1, rect2);
 		}
+
 		return false;
 
 	}
