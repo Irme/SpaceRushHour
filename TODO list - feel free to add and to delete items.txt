@@ -3,9 +3,11 @@ TODO list
 	1. Make Home Screen (Done)
 	2. Start Activity Puzzle (Done)
 	3. Implement onThouch events/handlers (looking in to this (Karin))
-	4. Collision detection for the bricks
+	4. Collision detection for the bricks(Irme, [almost] done)
+	4a. Make brick move in correct direction. (Done)
 	5. Load xml file with puzzles (perhaps: http://www.androidhive.info/2011/11/android-xml-parsing-tutorial/)
 	6. Figure out what sort of objects the tiles should be (Done)??
-	7. See if it is possible to load textures onto the bricks
+	7. See if it is possible to load textures onto the bricks(Irme)
+	8. Add method to see if puzzles are done.
 
 	
