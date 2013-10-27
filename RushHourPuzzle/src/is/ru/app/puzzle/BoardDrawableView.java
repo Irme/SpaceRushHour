@@ -1,12 +1,21 @@
 package is.ru.app.puzzle;
 
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
+import org.xmlpull.v1.XmlPullParserException;
 
 import android.content.Context;
 import android.graphics.Canvas;
+
 import android.graphics.Rect;
 import android.graphics.drawable.ShapeDrawable;
 import android.util.DisplayMetrics;
@@ -16,122 +25,96 @@ import android.widget.Toast;
 
 public class BoardDrawableView extends View {
 	private List<ShapeDrawable> shapes = new ArrayList<ShapeDrawable>();
-	private ShapeDrawable m_shape = new ShapeDrawable();
-	private Rect m_rect = new Rect(); // Or other Shape
-	private Integer[] m_colors = { 0xff74AC23, 0xff74AB73, 0xff74DD26,
-			0xff74AC13, 0xff84AC13, 0xffffBC13, 0xff74AC00, 0xffAAAC73 };
+
+	//private Integer[] m_colors = { 0xff74AC23, 0xff74AB73, 0xff74DD26,
+	//		0xff74AC13, 0xff84AC13, 0xffffBC13, 0xff74AC00, 0xffAAAC73 };
+	
+	//Blue colors
+	private Integer[] m_colors = { 0xff99CCCC, 0xff0099CC, 0xff3399CC, 0xff6699CC, 0xff6633FF, 
+								   0xff0000CC, 0xff0033CC, 0xff6633CC, 0xff663366 };
+	
+	private Integer[] m_green_colors = { 0xff33CC99, 0xff66CC99, 0xff99CC99, 0xff009966,
+										 0xff339966, 0xff669966, 0xff999966, 0xff999933,
+										 0xff999900, 0xff669933, 0xff666633, 0xff666600,
+										 0xff336633, 0xff336600, 0xff006633, 0xff006600,
+										 0xff006666, 0xff336666 };
+	
 	Toast toast = Toast.makeText(getContext(), "BOING", Toast.LENGTH_SHORT);
 
-	//private int[] m_colors = { Color.RED, Color.GREEN, Color.BLUE,
-	//		Color.LTGRAY, Color.CYAN, Color.YELLOW, Color.MAGENTA, Color.WHITE };
+	
+	
 	int heightScreen = 0;
 	int widthScreen = 0;
 	boolean moving = false;
 	int startX = 0, startY = 0, endX = 0, endY = 0;
 	int deltaX = 0, deltaY = 0;
+	
+	private static final String puzzleFile = "challenge_classic40.xml";
+	
 	// <setup>(H 1 2 2), (V 0 1 3), (H 0 0 2), (V 3 1 3), (H 2 5 3), (V 0 4 2),
 	// (H 4 4 2), (V 5 0 3)</setup>
 	Map<String, ArrayList<Integer>> boxes = new HashMap<String, ArrayList<Integer>>();
-
-	private int[][] board = { { 1, 1, 1, 1, 1, 1 }, { 1, 0, 2, 0, 0, 0 },
-			{ 0, 0, 2, 0, 0, 1 }, { 0, 1, 1, 1, 0, 1 }, { 0, 0, 0, 0, 1, 1 },
-			{ 1, 1, 1, 0, 1, 0 } };
 
 	public BoardDrawableView(Context context) {
 		super(context);
 		DisplayMetrics metrics = context.getResources().getDisplayMetrics();
 		widthScreen = metrics.widthPixels;
 		heightScreen = metrics.heightPixels;
-		createBoxes();
-		init2();
+		readInPuzzle(puzzleFile);
+		init();
+	}
+	
+	public void readInPuzzle(String puzzleFile){
+		PuzzleXmlParser xmlParser = new PuzzleXmlParser();
+		try {
+			InputStream in = getContext().getAssets().open(puzzleFile);
+			xmlParser.parse(in);
+			createBoxes(xmlParser);
+		} catch (IOException e ) {
+			e.printStackTrace();
+		} catch ( XmlPullParserException xmlEx) {
+			xmlEx.printStackTrace();
+		}
 	}
 
 	// <setup>(H 1 2 2), (V 0 1 3), (H 0 0 2), (V 3 1 3), (H 2 5 3), (V 0 4 2),
 	// (H 4 4 2), (V 5 0 3)</setup>
-	public void createBoxes() {
-		ArrayList<Integer> box1 = new ArrayList<Integer>();
-		box1.add(1);
-		box1.add(2);
-		box1.add(2);
-		boxes.put("H122", box1);
-
-		ArrayList<Integer> box2 = new ArrayList<Integer>();
-		box2.add(0);
-		box2.add(1);
-		box2.add(3);
-		boxes.put("V013", box2);
-
-		ArrayList<Integer> box3 = new ArrayList<Integer>();
-		box3.add(0);
-		box3.add(0);
-		box3.add(2);
-		boxes.put("H002", box3);
-
-		ArrayList<Integer> box4 = new ArrayList<Integer>();
-		box4.add(3);
-		box4.add(1);
-		box4.add(3);
-		boxes.put("V313", box4);
-
-		ArrayList<Integer> box5 = new ArrayList<Integer>();
-		box5.add(2);
-		box5.add(5);
-		box5.add(3);
-		boxes.put("H253", box5);
-
-		ArrayList<Integer> box6 = new ArrayList<Integer>();
-		box6.add(0);
-		box6.add(4);
-		box6.add(2);
-		boxes.put("V042", box6);
-
-		ArrayList<Integer> box7 = new ArrayList<Integer>();
-		box7.add(4);
-		box7.add(4);
-		box7.add(2);
-		boxes.put("V442", box7);
-
-		ArrayList<Integer> box8 = new ArrayList<Integer>();
-		box8.add(5);
-		box8.add(0);
-		box8.add(3);
-		boxes.put("V503", box8);
+	public void createBoxes(PuzzleXmlParser xmlParser) {
+		List<Puzzle> puzzles = xmlParser.getPuzzles();
+		Pattern pattern = Pattern.compile("\\d+");
+		for(Puzzle p : puzzles){
+			String setup = p.setup;
+			ArrayList<String> items = new  ArrayList<String>(Arrays.asList(setup.split(",")));
+			
+			for(String s : items){
+				ArrayList<Integer> box = new ArrayList<Integer>();
+				Matcher m = pattern.matcher(s);
+				while (m.find()) {
+					String v = m.group();
+					box.add(Integer.valueOf(v));
+				}
+				boxes.put(s.trim(), box);
+			}
+			break; //We are at the moment only reading the first puzzle!!!
+		}
+		
+	/*	Iterator<Map.Entry<String, ArrayList<Integer>>> i = boxes.entrySet().iterator(); 
+		while(i.hasNext()){
+		    String key = i.next().getKey();
+		    
+		    System.out.println(key + ", "+boxes.get(key) );
+		}*/
+		
 	}
 
 	protected void init() {
 		int width = widthScreen / 6;
 		int height = width;
-		int x = 0;
-		int y = 0;
-		int xOffset = width;
-		int yOffset = width;
-		for (int i = 0; i < board.length; i++) {
-
-			for (int j = 0; j < board[i].length; j++) {
-				if (board[i][j] == 1 || board[i][j] == 2) {
-
-					m_rect.set(x, y, x + width, y + height);
-
-					m_shape.setBounds(m_rect);
-					m_shape.getPaint().setColor(m_colors[i]);
-					m_shape.setPadding(20, 20, 20, 20);
-					shapes.add(m_shape);
-				}
-				y = +y + yOffset;
-			}
-			x = +x + xOffset;
-			y = 0;
-		}
-	}
-
-	protected void init2() {
-		int width = widthScreen / 6;
-		int height = width;
-		int x = 0;
-		int y = 0;
+		int x = 0, y = 0;
 		int xOffset = width;
 		int yOffset = width;
 		int count = 0;
+		
 		for (Map.Entry<String, ArrayList<Integer>> entry : boxes.entrySet()) {
 			String key = entry.getKey();
 			ArrayList<Integer> values = entry.getValue();
@@ -143,17 +126,16 @@ public class BoardDrawableView extends View {
 			ShapeDrawable shapeD = new ShapeDrawable();
 			y = y * yOffset;
 			x = x * xOffset;
-			if (key.startsWith("H")) {
+			if (key.startsWith("(H")) {
 				shape.set(x, y, x + span, y + height);
 				shapeD.setBounds(shape);
-			} else if (key.startsWith("V")) {
+			} else if (key.startsWith("(V")) {
 				shape.set(x, y, x + width, y + span);
 				shapeD.setBounds(shape);
 			}
-			shapeD.getPaint().setColor(m_colors[count]);
+			shapeD.getPaint().setColor(m_colors[count]); 
 			// shapeD.setPadding(20, 20, 20, 20);
 			shapes.add(shapeD);
-
 			count++;
 		}
 	}
@@ -166,39 +148,6 @@ public class BoardDrawableView extends View {
 	}
 
 	@Override
-	/*	public boolean onTouchEvent(MotionEvent event) {
-		if (event.getAction() == MotionEvent.ACTION_DOWN) {
-			int x = (int) event.getX();
-			int y = (int) event.getY();
-
-			if(startX > 0 && startY > 0){
-				deltaX = startX - x;
-				deltaY = startY - y;
-			}
-
-			startX = x;
-			startY = y;
-
-			switch (event.getAction()) {
-			case MotionEvent.ACTION_DOWN:
-			//	m_shape.getPaint().setColor(Color.RED);
-			//	m_shape.draw(canvas);
-				isHitBlock(x + deltaX, y + deltaY);
-				break;
-			case MotionEvent.ACTION_MOVE:
-				//m_shape.getPaint().setColor(Color.BLUE);
-				//m_shape.draw(canvas);
-				isHitBlock(x + deltaX, y + deltaY);
-				break;
-			default:
-				break;
-			}
-			invalidate();
-			return true;
-		}
-		return false;
-	}_*/
-
 	public boolean onTouchEvent(MotionEvent event) {
 		final int x = (int)event.getX();
 		final int y = (int)event.getY();
@@ -291,6 +240,5 @@ public class BoardDrawableView extends View {
 		} else{
 			return true;
 		}
-		
 	}
 }

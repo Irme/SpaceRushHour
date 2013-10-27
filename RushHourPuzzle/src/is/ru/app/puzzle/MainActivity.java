@@ -27,10 +27,8 @@ public class MainActivity extends Activity {
 	
 	public void buttonPressed(View view) {
 		//open puzzle from here
-		System.out.println("test");
-		
-	       Intent intent = new Intent(this, PuzzleActivity.class);
-	       startActivity(intent);
+	    Intent intent = new Intent(this, PuzzleActivity.class);
+	    startActivity(intent);
 	}
 
 }
