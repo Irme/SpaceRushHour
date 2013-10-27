@@ -208,11 +208,14 @@ public class BoardDrawableView extends View {
 			if(bounds != null){
 				Rect rect = new Rect();
 				rect.set(bounds.getBounds().left, bounds.getBounds().top, bounds.getBounds().right, bounds.getBounds().bottom);
-				moving = rect.intersects(x, y, x+1, y+1);
+				moving = (rect.intersects(x, y, x+1, y+1)&& (!collision(bounds)));
 				invalidate();
 			}
 			return true;
 		case MotionEvent.ACTION_MOVE:
+			int x_old;
+			int y_old;
+
 			if( bounds != null && moving ){
 				final int x_new = (int)event.getX();
 				final int y_new = (int)event.getY();
@@ -221,29 +224,31 @@ public class BoardDrawableView extends View {
 						int with = Math.abs(bounds.getBounds().left - bounds.getBounds().right);
 						int height = Math.abs(bounds.getBounds().bottom - bounds.getBounds().top);
 						//TODO: fix bounds
-						for (ShapeDrawable shape  : shapes){
-							if(collision(bounds, shape)){
-								moving = false;
-							}
-							else{	
-								if(horizontal(bounds)){
+
+						if(collision(bounds)){
+							moving = false;
+							invalidate();
+						}
+						else{	
+							if(horizontal(bounds)){
 								bounds.setBounds(
 										x_new - with/2,
 										bounds.getBounds().top,
 										x_new + with/2,
 										bounds.getBounds().bottom);
+
 								invalidate();
-								}
-								else{
-									bounds.setBounds(
-											bounds.getBounds().left,
-											y_new - height/2,
-											bounds.getBounds().right,
-											y_new + height/2);
-									invalidate();
-									
-								}
 							}
+							else{
+								bounds.setBounds(
+										bounds.getBounds().left,
+										y_new - height/2,
+										bounds.getBounds().right,
+										y_new + height/2);
+								invalidate();
+
+							}
+
 
 						}
 					} 
@@ -257,14 +262,15 @@ public class BoardDrawableView extends View {
 		return false;
 	}        
 	@SuppressWarnings("static-access")
-	private boolean collision(ShapeDrawable shape1, ShapeDrawable shape2){
-		if(shape1.getBounds() != shape2.getBounds()){
-			Rect rect1 = new Rect(shape1.getBounds().left, shape1.getBounds().top, shape1.getBounds().right, shape1.getBounds().bottom);
-			Rect rect2 = new Rect(shape2.getBounds().left, shape2.getBounds().top, shape2.getBounds().right, shape2.getBounds().bottom);
-			
-			return rect1.intersects(rect1, rect2);
-		}
+	private boolean collision(ShapeDrawable shape1){
+		for (ShapeDrawable shape2 : shapes){
+			if(shape1.getBounds() != shape2.getBounds()){
+				Rect rect1 = new Rect(shape1.getBounds().left, shape1.getBounds().top, shape1.getBounds().right, shape1.getBounds().bottom);
+				Rect rect2 = new Rect(shape2.getBounds().left, shape2.getBounds().top, shape2.getBounds().right, shape2.getBounds().bottom);
 
+				return rect1.intersects(rect1, rect2);
+			}
+		}
 		return false;
 
 	}
@@ -278,7 +284,7 @@ public class BoardDrawableView extends View {
 		}
 		return null;
 	}
-	
+
 	/*
 	 * Simple method to see if a block is horizontally positioned or vertically.
 	 * returns true if it is horizontal.
@@ -291,6 +297,6 @@ public class BoardDrawableView extends View {
 		} else{
 			return true;
 		}
-		
+
 	}
 }
