@@ -134,7 +134,7 @@ public class BoardDrawableView extends View {
 				shape.set(x, y, x + width, y + span);
 				shapeD.setBounds(shape);
 			}
-		//	shapeD.getPaint().setStyle(Style.STROKE);
+			shapeD.getPaint().setStyle(Style.STROKE);
 		//	shapeD.getPaint().setShader(makeLinear());
 			shapeD.getPaint().setColor(m_colors[count++]);
 			// shapeD.setPadding(20, 20, 20, 20);
@@ -175,6 +175,7 @@ public class BoardDrawableView extends View {
 	public boolean onTouchEvent(MotionEvent event) {
 		final int x = (int) event.getX();
 		final int y = (int) event.getY();
+		if(isHitBlockTrue(x, y)){
 		final ShapeDrawable bounds = isHitBlock(x, y);
 		int range[] = maxRange(bounds);
 		switch (event.getAction()) {
@@ -234,6 +235,10 @@ public class BoardDrawableView extends View {
 			return true;
 		}
 		return false;
+		}
+		else{
+			return false;
+		}
 	}      
 
 	private boolean collision(ShapeDrawable shape1){
@@ -258,6 +263,7 @@ public class BoardDrawableView extends View {
 
 	private int [] maxRange(ShapeDrawable shape){
 		//First entry is left/up moving range, second entry is right/down moving range.
+		if(shape != null){
 		int maxleft = 100000;
 		int maxright = 10000;
 		int [] range = new int[2];
@@ -299,8 +305,9 @@ public class BoardDrawableView extends View {
 			}
 
 		}
-
 		return range;
+		}
+		return null;
 	}
 
 	private ShapeDrawable isHitBlock(int x, int y) {
@@ -311,6 +318,16 @@ public class BoardDrawableView extends View {
 			}
 		}
 		return null;
+	}
+	
+	private boolean isHitBlockTrue(int x, int y) {
+		for (ShapeDrawable shape : shapes) {
+			Rect bounds = shape.getBounds();
+			if (bounds.contains(x, y)) {
+				return true;
+			}
+		}
+		return false;
 	}
 
 	/*
