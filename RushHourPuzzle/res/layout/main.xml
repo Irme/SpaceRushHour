@@ -4,8 +4,6 @@
               android:layout_width="match_parent"
               android:layout_height="match_parent"
         >
-
-
     <TableLayout
             android:id="@+id/grid"
             android:layout_width="fill_parent"
@@ -22,11 +20,9 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:text="@string/play"
-                    android:id="@+id/buttonP" 
-                    android:onClick="buttonPressed"
-                    />
-            
-          
+                    android:id="@+id/buttonPlay" 
+                    android:onClick="buttonPlay"
+                    />          
         </TableRow>
        
                   <TableRow
