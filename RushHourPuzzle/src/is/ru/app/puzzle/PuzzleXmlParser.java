@@ -47,9 +47,11 @@ public class PuzzleXmlParser {
 	// to their respective "read" methods for processing. Otherwise, skips the tag.
 	private Puzzle readPuzzle(XmlPullParser parser) throws XmlPullParserException, IOException {
 	    parser.require(XmlPullParser.START_TAG, ns, "puzzle");
+	    String id = parser.getAttributeValue(0);
 	    String level = null;
 	    String length = null;
 	    String setup = null;
+	    
 	    while (parser.next() != XmlPullParser.END_TAG) {
 	        if (parser.getEventType() != XmlPullParser.START_TAG) {
 	            continue;
@@ -63,7 +65,7 @@ public class PuzzleXmlParser {
 	        	setup = readTag(parser, name);
 	        } 
 	    }
-	    return new Puzzle(level, length, setup);
+	    return new Puzzle(id, level, length, setup);
 	}
 	
 	// Processes title tags in the feed.
