@@ -27,7 +27,7 @@ public class ListPuzzlesActivity extends ListActivity{
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		readInPuzzle(puzzleFile);
-		System.out.println("Create");
+	//	setContentView(R.layout.puzzle_list);
 	    ArrayAdapter<Puzzle> adapter = new ArrayAdapter<Puzzle>(this, android.R.layout.simple_list_item_1, puzzles);
 	    setListAdapter(adapter);
 	 }
