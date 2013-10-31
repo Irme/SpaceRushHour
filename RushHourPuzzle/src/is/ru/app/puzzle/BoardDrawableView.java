@@ -176,6 +176,7 @@ public class BoardDrawableView extends View {
 		final int x = (int) event.getX();
 		final int y = (int) event.getY();
 		final ShapeDrawable bounds = isHitBlock(x, y);
+		int range[] = maxRange(bounds);
 		switch (event.getAction()) {
 		case MotionEvent.ACTION_DOWN:
 			if (bounds != null) {
@@ -204,25 +205,22 @@ public class BoardDrawableView extends View {
 
 
 						if(horizontal(bounds)){
-							System.out.println(range [0] + " " + range[1]);
-							System.out.println(x_new + "," +y_new);
-							//							if(x_new < range[1] && x_new > range[1]){
-							//								bounds.setBounds(x_new - width/2,
-							//										old_top,
-							//										x_new + width/2,
-							//										old_bottom);
-							//							}
+							System.out.println(range[0] +" , "+ range[1]);
+							bounds.setBounds(x_new - width/2,
+									old_top,
+									x_new + width/2,
+									old_bottom);
+							invalidate();
 
 
 
 						}else{
-
-							System.out.println(range [0] + " " + range[1]);
-							System.out.println(x_new + "," +y_new);
-							//							if(y_new < range[1] && y_new > range[1]){
-							//								bounds.setBounds(old_left, y_new - height/2, old_right, y_new+ height/2);
-							//								
-							//							}
+							System.out.println(range[0] +" , "+ range[1]);
+							bounds.setBounds(old_left,
+									y_new - height/2, 
+									old_right, 
+									y_new+ height/2);
+							invalidate();
 
 
 						}
@@ -260,32 +258,37 @@ public class BoardDrawableView extends View {
 
 	private int [] maxRange(ShapeDrawable shape){
 		//First entry is left/up moving range, second entry is right/down moving range.
+		int maxleft = 100000;
+		int maxright = 10000;
 		int [] range = new int[2];
 		for (ShapeDrawable shape2 : shapes){
 			if(!shape.equals(shape2)){
-				int maxleft = 100000;
-				int maxright = 10000;
+				
 				if(horizontal(shape) == true){
-					if(((shape.getBounds().top <= shape2.getBounds().top) && (shape2.getBounds().top <shape.getBounds().bottom))|| ((shape.getBounds().top <= shape2.getBounds().bottom) && (shape2.getBounds().bottom <shape.getBounds().bottom))){
-						if(shape2.getBounds().left < shape.getBounds().right){
+					if(((shape.getBounds().top < shape2.getBounds().top) && (shape2.getBounds().top <shape.getBounds().bottom))|| 
+							((shape.getBounds().top < shape2.getBounds().bottom) && (shape2.getBounds().bottom <shape.getBounds().bottom))||
+							(((shape2.getBounds().top < shape.getBounds().top) && (shape.getBounds().bottom < shape2.getBounds().bottom)))){
+						if(shape2.getBounds().left <= shape.getBounds().right){
 							//It's to the right from our current brick
-							maxright = Math.min(maxright, (shape2.getBounds().right-shape.getBounds().left));
+							maxright = Math.min(maxright, Math.abs((shape2.getBounds().right-shape.getBounds().left)));
 							System.out.println("horizontal right bound detected");
 						} else {
 							// It's to the left obviously
-							maxleft = Math.min(maxleft, (shape.getBounds().right-shape2.getBounds().left));
+							maxleft = Math.min(maxleft, Math.abs((shape.getBounds().right-shape2.getBounds().left)));
 						}
 
 					}
 
 
 				} else {
-					if(((shape.getBounds().left <= shape2.getBounds().right) && (shape2.getBounds().right <shape.getBounds().right))||((shape.getBounds().left <= shape2.getBounds().left) && (shape2.getBounds().left <shape.getBounds().right))){
-						if(shape2.getBounds().top < shape.getBounds().bottom){
+					if(((shape.getBounds().left < shape2.getBounds().right) && (shape2.getBounds().right <shape.getBounds().right))||
+							((shape.getBounds().left < shape2.getBounds().left) && (shape2.getBounds().left <shape.getBounds().right))
+							||((shape2.getBounds().left < shape.getBounds().left)&&(shape.getBounds().right < shape2.getBounds().left))){
+						if(shape2.getBounds().top <=shape.getBounds().bottom){
 							//It's above from our current brick
-							maxright = Math.min(maxright, (shape2.getBounds().bottom-shape.getBounds().top));
+							maxright = Math.min(maxright, Math.abs((shape2.getBounds().bottom-shape.getBounds().top)));
 							// It's below obviously
-							maxleft = Math.min(maxleft, (shape.getBounds().bottom-shape2.getBounds().top));
+							maxleft = Math.min(maxleft, Math.abs((shape.getBounds().bottom-shape2.getBounds().top)));
 						}
 
 					}
@@ -323,5 +326,16 @@ public class BoardDrawableView extends View {
 			return true;
 		}
 
+	}
+	
+	private boolean free(int x, int y, ShapeDrawable shape){
+		for(ShapeDrawable shape2 : shapes){
+			if(!shape.equals(shape2)){
+				if(shape2.getBounds().contains(x, y)){
+					return true;
+				}
+			} return false;
+		}
+		return false;
 	}
 }
