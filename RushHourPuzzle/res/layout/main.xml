@@ -25,12 +25,24 @@
                     android:id="@+id/buttonP" 
                     android:onClick="buttonPressed"
                     />
+            
+          
         </TableRow>
        
-      
+                  <TableRow
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:padding="5dip"
+                >
+                     <Button
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="@string/puzzleList"
+                    android:id="@+id/buttonPuzzleList" 
+                    android:onClick="buttonPuzzleList"
+                    />
+        </TableRow>
        
     </TableLayout>
 
 </LinearLayout>
-
-

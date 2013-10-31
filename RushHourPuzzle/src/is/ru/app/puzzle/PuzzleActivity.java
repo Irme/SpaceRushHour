@@ -11,17 +11,31 @@ public class PuzzleActivity extends Activity{
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-	    
-		mBoardDrawableView = new BoardDrawableView(this);
+		Bundle b = getIntent().getExtras();
+		int id = b == null ? 0 : b.getInt("id");
+		mBoardDrawableView = new BoardDrawableView(this, id);
 	    setContentView(mBoardDrawableView);
 	}
-	   @Override
-	    protected void onPause() {
-	        super.onPause();
-	    }
-	    
-	    @Override
-	    protected void onResume() {
-	        super.onResume();
-	    }
+	@Override
+	protected void onPause() {
+		// TODO Auto-generated method stub
+		super.onPause();
+	}
+
+	@Override
+	protected void onResume() {
+		// TODO Auto-generated method stub
+		super.onResume();
+	}
+
+	@Override
+	protected void onStop() {
+		// TODO Auto-generated method stub
+		super.onStop();
+	}
+	
+    @Override
+    protected void onRestart() {
+        super.onRestart();
+    }
 	}

@@ -25,10 +25,33 @@ public class MainActivity extends Activity {
 		return true;
 	}
 	
-	public void buttonPressed(View view) {
+	public void buttonPlay(View view) {
 		//open puzzle from here
 	    Intent intent = new Intent(this, PuzzleActivity.class);
 	    startActivity(intent);
 	}
+	
+	public void buttonPuzzleList(View view) {
+		//open puzzle from here
+	    Intent intent = new Intent(this, ListPuzzlesActivity.class);
+	    startActivity(intent);
+	}
 
+	@Override
+	protected void onPause() {
+		// TODO Auto-generated method stub
+		super.onPause();
+	}
+
+	@Override
+	protected void onResume() {
+		// TODO Auto-generated method stub
+		super.onResume();
+	}
+
+	@Override
+	protected void onStop() {
+		// TODO Auto-generated method stub
+		super.onStop();
+	}
 }

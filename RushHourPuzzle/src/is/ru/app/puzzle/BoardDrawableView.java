@@ -6,8 +6,11 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.LinkedHashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.TreeMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -15,55 +18,57 @@ import org.xmlpull.v1.XmlPullParserException;
 
 import android.content.Context;
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
+import android.graphics.BitmapShader;
 import android.graphics.Canvas;
+import android.graphics.LinearGradient;
+import android.graphics.Paint.Style;
+import android.graphics.Shader;
+import android.graphics.SweepGradient;
 
 import android.graphics.Rect;
 import android.graphics.drawable.ShapeDrawable;
+import android.util.AttributeSet;
 import android.util.DisplayMetrics;
 import android.view.MotionEvent;
 import android.view.View;
 import android.widget.Toast;
 
 public class BoardDrawableView extends View {
+
 	private List<ShapeDrawable> shapes = new ArrayList<ShapeDrawable>();
+	private int id = 0;
 
-	//private Integer[] m_colors = { 0xff74AC23, 0xff74AB73, 0xff74DD26,
-	//		0xff74AC13, 0xff84AC13, 0xffffBC13, 0xff74AC00, 0xffAAAC73 };
+	// Blue colors
+	private Integer[] m_colors = { 0xffCC0000, 0xff0099CC, 0xff3399CC,
+			0xff6699CC, 0xff6633FF, 0xff0000CC, 0xff0033CC, 0xff6633CC,
+			0xff663366, 0xff33FFFF, 0xff339999, 0xff33CCFF, 0xff9999CC, 
+			0xff0066FF, 0xff3300FF, 0xff0066CC, 0xff333399, 0xff330066 };
 
-	//Blue colors
-	private Integer[] m_colors = { 0xff99CCCC, 0xff0099CC, 0xff3399CC, 0xff6699CC, 0xff6633FF, 
-			0xff0000CC, 0xff0033CC, 0xff6633CC, 0xff663366 };
+	private Integer[] m_green_colors = { 0xff33CC99, 0xff66CC99, 0xff99CC99,
+			0xff009966, 0xff339966, 0xff669966, 0xff999966, 0xff999933,
+			0xff999900, 0xff669933, 0xff666633, 0xff666600, 0xff336633,
+			0xff336600, 0xff006633, 0xff006600, 0xff006666, 0xff336666 };
 
-	private Integer[] m_green_colors = { 0xff33CC99, 0xff66CC99, 0xff99CC99, 0xff009966,
-			0xff339966, 0xff669966, 0xff999966, 0xff999933,
-			0xff999900, 0xff669933, 0xff666633, 0xff666600,
-			0xff336633, 0xff336600, 0xff006633, 0xff006600,
-			0xff006666, 0xff336666 };
+	Toast toast = Toast.makeText(getContext(), "BOING", Toast.LENGTH_SHORT);
 
-	Bitmap m_texture;
-
-
-
-	int heightScreen = 0;
-	int widthScreen = 0;
-	boolean moving = false;
-	int startX = 0, startY = 0, endX = 0, endY = 0;
-	int deltaX = 0, deltaY = 0;
-	Toast toast = Toast.makeText(getContext(),"BOING",Toast.LENGTH_SHORT);
-
+	private int heightScreen = 0;
+	private int widthScreen = 0;
+	private boolean moving = false;
+	private int startX = 0, startY = 0, endX = 0, endY = 0;
+	private int deltaX = 0, deltaY = 0;
 
 	private static final String puzzleFile = "challenge_classic40.xml";
 
 	// <setup>(H 1 2 2), (V 0 1 3), (H 0 0 2), (V 3 1 3), (H 2 5 3), (V 0 4 2),
 	// (H 4 4 2), (V 5 0 3)</setup>
-	Map<String, ArrayList<Integer>> boxes = new HashMap<String, ArrayList<Integer>>();
+	Map<String, LinkedList<Integer>> boxes = new LinkedHashMap<String, LinkedList<Integer>>();
 
-	public BoardDrawableView(Context context) {
+	public BoardDrawableView(Context context, int id) {
 		super(context);
 		DisplayMetrics metrics = context.getResources().getDisplayMetrics();
 		widthScreen = metrics.widthPixels;
 		heightScreen = metrics.heightPixels;
+		this.id = id;
 		readInPuzzle(puzzleFile);
 		init();
 	}
@@ -73,42 +78,32 @@ public class BoardDrawableView extends View {
 		try {
 			InputStream in = getContext().getAssets().open(puzzleFile);
 			xmlParser.parse(in);
-			createBoxes(xmlParser);
-		} catch (IOException e ) {
+			createBoxes(xmlParser, id);
+		} catch (IOException e) {
 			e.printStackTrace();
-		} catch ( XmlPullParserException xmlEx) {
+		} catch (XmlPullParserException xmlEx) {
 			xmlEx.printStackTrace();
 		}
 	}
 
 	// <setup>(H 1 2 2), (V 0 1 3), (H 0 0 2), (V 3 1 3), (H 2 5 3), (V 0 4 2),
 	// (H 4 4 2), (V 5 0 3)</setup>
-	public void createBoxes(PuzzleXmlParser xmlParser) {
+	public void createBoxes(PuzzleXmlParser xmlParser, int id) {
 		List<Puzzle> puzzles = xmlParser.getPuzzles();
 		Pattern pattern = Pattern.compile("\\d+");
-		for(Puzzle p : puzzles){
-			String setup = p.setup;
-			ArrayList<String> items = new  ArrayList<String>(Arrays.asList(setup.split(",")));
-
-			for(String s : items){
-				ArrayList<Integer> box = new ArrayList<Integer>();
-				Matcher m = pattern.matcher(s);
-				while (m.find()) {
-					String v = m.group();
-					box.add(Integer.valueOf(v));
-				}
-				boxes.put(s.trim(), box);
+		Puzzle p = puzzles.get(id);
+		String setup = p.setup;
+		LinkedList<String> items = new LinkedList<String>(Arrays.asList(setup.split(",")));
+		
+		for (String s : items) {
+			LinkedList<Integer> box = new LinkedList<Integer>();
+			Matcher m = pattern.matcher(s);
+			while (m.find()) {
+				String v = m.group();
+				box.add(Integer.valueOf(v));
 			}
-			break; //We are at the moment only reading the first puzzle!!!
+			boxes.put(s.trim(), box);
 		}
-
-		/*	Iterator<Map.Entry<String, ArrayList<Integer>>> i = boxes.entrySet().iterator(); 
-		while(i.hasNext()){
-		    String key = i.next().getKey();
-
-		    System.out.println(key + ", "+boxes.get(key) );
-		}*/
-
 	}
 
 	protected void init() {
@@ -119,17 +114,19 @@ public class BoardDrawableView extends View {
 		int yOffset = width;
 		int count = 0;
 
-		for (Map.Entry<String, ArrayList<Integer>> entry : boxes.entrySet()) {
+		for (Map.Entry<String, LinkedList<Integer>> entry : boxes.entrySet()) {
 			String key = entry.getKey();
-			ArrayList<Integer> values = entry.getValue();
+			LinkedList<Integer> values = entry.getValue();
 			x = values.get(0);
 			y = values.get(1);
 			int span = values.get(2);
 			span = span * width;
 			Rect shape = new Rect(); // Or other Shape
+			
 			ShapeDrawable shapeD = new ShapeDrawable();
 			y = y * yOffset;
 			x = x * xOffset;
+			
 			if (key.startsWith("(H")) {
 				shape.set(x, y, x + span, y + height);
 				shapeD.setBounds(shape);
@@ -137,35 +134,55 @@ public class BoardDrawableView extends View {
 				shape.set(x, y, x + width, y + span);
 				shapeD.setBounds(shape);
 			}
-			m_texture = BitmapFactory.decodeResource(getResources(),
-					R.drawable.stone);
-			shapeD.getPaint().setColor(m_colors[count]); 
+		//	shapeD.getPaint().setStyle(Style.STROKE);
+		//	shapeD.getPaint().setShader(makeLinear());
+			shapeD.getPaint().setColor(m_colors[count++]);
 			// shapeD.setPadding(20, 20, 20, 20);
 			shapes.add(shapeD);
-			count++;
 		}
 	}
+	
+	 private static Shader makeSweep() {
+         return new SweepGradient(150, 25,
+             new int[] { 0xFFFF0000, 0xFF00FF00, 0xFF0000FF, 0xFFFF0000 },
+             null);
+     }
+
+     private static Shader makeLinear() {
+         return new LinearGradient(0, 0, 50, 50,
+                           new int[] { 0xFFFF0000, 0xFF00FF00, 0xFF0000FF },
+                           null, Shader.TileMode.CLAMP);
+     }
+
+     private static Shader makeTiling() {
+         int[] pixels = new int[] { 0xFF00FF00, 0xFF0000FF,0xFFFF0000, 0};
+         Bitmap bm = Bitmap.createBitmap(pixels, 4, 4,
+                                         Bitmap.Config.ARGB_8888);
+
+         return new BitmapShader(bm, Shader.TileMode.REPEAT,
+                                     Shader.TileMode.REPEAT);
+     }
 
 	protected void onDraw(Canvas canvas) {
 		super.onDraw(canvas);
 		for (ShapeDrawable shape : shapes) {
+			//shape.getBounds().inset( (int)(shape.getBounds().width() * 0.01), (int)(shape.getBounds().height() * 0.01) );
 			shape.draw(canvas);
 		}
 	}
 
 	@Override
 	public boolean onTouchEvent(MotionEvent event) {
-		final int x = (int)event.getX();
-		final int y = (int)event.getY();
+		final int x = (int) event.getX();
+		final int y = (int) event.getY();
 		final ShapeDrawable bounds = isHitBlock(x, y);
-		int [] range = 
-				maxRange(bounds);
-		switch( event.getAction() ){
+		switch (event.getAction()) {
 		case MotionEvent.ACTION_DOWN:
-			if(bounds != null){
-				Rect rect = new Rect();
-				rect.set(bounds.getBounds().left, bounds.getBounds().top, bounds.getBounds().right, bounds.getBounds().bottom);
-				moving = (rect.intersects(x, y, x+1, y+1));
+			if (bounds != null) {
+			//	Rect rect = new Rect();
+			//	rect.set(bounds.getBounds().left, bounds.getBounds().top,
+			//			bounds.getBounds().right, bounds.getBounds().bottom);
+				moving = (bounds.getBounds().intersects(x, y, x + 1, y + 1) && (!collision(bounds)));
 				invalidate();
 
 			}
@@ -297,12 +314,12 @@ public class BoardDrawableView extends View {
 	 * Simple method to see if a block is horizontally positioned or vertically.
 	 * returns true if it is horizontal.
 	 */
-	private boolean horizontal(ShapeDrawable rect1){
+	private boolean horizontal(ShapeDrawable rect1) {
 		int diffh = Math.abs(rect1.getBounds().left - rect1.getBounds().right);
 		int diffv = Math.abs(rect1.getBounds().bottom - rect1.getBounds().top);
-		if(diffv > diffh){
+		if (diffv > diffh) {
 			return false;
-		} else{
+		} else {
 			return true;
 		}
 
