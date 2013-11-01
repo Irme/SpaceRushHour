@@ -134,7 +134,7 @@ public class BoardDrawableView extends View {
 				shape.set(x, y, x + width, y + span);
 				shapeD.setBounds(shape);
 			}
-			shapeD.getPaint().setStyle(Style.STROKE);
+			//shapeD.getPaint().setStyle(Style.STROKE);
 		//	shapeD.getPaint().setShader(makeLinear());
 			shapeD.getPaint().setColor(m_colors[count++]);
 			// shapeD.setPadding(20, 20, 20, 20);
@@ -271,30 +271,35 @@ public class BoardDrawableView extends View {
 			if(!shape.equals(shape2)){
 				
 				if(horizontal(shape) == true){
-					if(((shape.getBounds().top < shape2.getBounds().top) && (shape2.getBounds().top <shape.getBounds().bottom))|| 
+					if(((shape.getBounds().top < shape2.getBounds().top) && (shape2.getBounds().top < shape.getBounds().bottom))|| 
 							((shape.getBounds().top < shape2.getBounds().bottom) && (shape2.getBounds().bottom <shape.getBounds().bottom))||
-							(((shape2.getBounds().top < shape.getBounds().top) && (shape.getBounds().bottom < shape2.getBounds().bottom)))){
-						if(shape2.getBounds().left <= shape.getBounds().right){
+							(((shape2.getBounds().top <= shape.getBounds().top) && (shape.getBounds().bottom <= shape2.getBounds().bottom)))){
+						if((shape2.getBounds().left - shape.getBounds().right) < (shape.getBounds().left - shape2.getBounds().right)){
 							//It's to the right from our current brick
-							maxright = Math.min(maxright, Math.abs((shape2.getBounds().right-shape.getBounds().left)));
-							System.out.println("horizontal right bound detected");
+							maxleft = Math.min(maxleft,Math.abs((shape.getBounds().left-shape2.getBounds().right)));
+							//System.out.println("horizontal right bound detected");
 						} else {
 							// It's to the left obviously
-							maxleft = Math.min(maxleft, Math.abs((shape.getBounds().right-shape2.getBounds().left)));
+				
+							maxright = Math.min(maxright, Math.abs((shape2.getBounds().left-shape.getBounds().right)));
 						}
 
 					}
 
 
 				} else {
-					if(((shape.getBounds().left < shape2.getBounds().right) && (shape2.getBounds().right <shape.getBounds().right))||
-							((shape.getBounds().left < shape2.getBounds().left) && (shape2.getBounds().left <shape.getBounds().right))
-							||((shape2.getBounds().left < shape.getBounds().left)&&(shape.getBounds().right < shape2.getBounds().left))){
-						if(shape2.getBounds().top <=shape.getBounds().bottom){
+					if(((shape.getBounds().left < shape2.getBounds().left) && (shape2.getBounds().left <shape.getBounds().right))||
+							((shape.getBounds().left < shape2.getBounds().right) && (shape2.getBounds().right <shape.getBounds().right))
+							||((shape2.getBounds().left <= shape.getBounds().left)&&(shape.getBounds().right <= shape2.getBounds().right))){
+						if((shape2.getBounds().bottom -shape.getBounds().top)<(shape.getBounds().bottom -shape2.getBounds().top)){
 							//It's above from our current brick
 							maxright = Math.min(maxright, Math.abs((shape2.getBounds().bottom-shape.getBounds().top)));
-							// It's below obviously
+							
+						} else{
+
+							// It's below
 							maxleft = Math.min(maxleft, Math.abs((shape.getBounds().bottom-shape2.getBounds().top)));
+							
 						}
 
 					}
