@@ -2,12 +2,21 @@
 TODO list
 	1. Make Home Screen (Done)
 	2. Start Activity Puzzle (Done)
-	3. Implement onThouch events/handlers (looking in to this (Karin))
+	3. Implement onThouch events/handlers (Done)
 	4. Collision detection for the bricks(Irme, [almost] done)
 	4a. Make brick move in correct direction. (Done)
-	5. Load xml file with puzzles (perhaps: http://www.androidhive.info/2011/11/android-xml-parsing-tutorial/)
+	5. Load xml file with puzzles (Done)
 	6. Figure out what sort of objects the tiles should be (Done)??
 	7. See if it is possible to load textures onto the bricks(Irme)
-	8. Add method to see if puzzles are done.
+	8. Add method to see if puzzles are done. (Irme)
+	9. Rotation (Irme)
+	10. fancy start menu (karin)
+	11. The listing should show which puzzles have already been solved. (karin)
+	12. Make it easy for the user to navigate to the next puzzle. (karin)
+	
+	13. The app remembers which puzzle the user was working on, so it can start by
+		default on that puzzle (when the user selects the ‘Play’ option). (look at this one, Karin)
+		
+	14. A configure option to adjust various settings (of your choice) within your application.
 
 	
