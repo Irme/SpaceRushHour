@@ -14,6 +14,8 @@ import java.util.TreeMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import javax.crypto.spec.IvParameterSpec;
+
 import org.xmlpull.v1.XmlPullParserException;
 
 import android.content.Context;
@@ -37,6 +39,7 @@ public class BoardDrawableView extends View {
 
 	private List<ShapeDrawable> shapes = new ArrayList<ShapeDrawable>();
 	private int id = 0;
+	private int ratio;
 
 	// Blue colors
 	private Integer[] m_colors = { 0xffCC0000, 0xff0099CC, 0xff3399CC,
@@ -66,8 +69,16 @@ public class BoardDrawableView extends View {
 	public BoardDrawableView(Context context, int id) {
 		super(context);
 		DisplayMetrics metrics = context.getResources().getDisplayMetrics();
+
 		widthScreen = metrics.widthPixels;
 		heightScreen = metrics.heightPixels;
+		if(widthScreen > heightScreen){
+			widthScreen = heightScreen;
+			
+		} else {
+			heightScreen = widthScreen;
+
+		}
 		this.id = id;
 		readInPuzzle(puzzleFile);
 		init();
@@ -173,6 +184,7 @@ public class BoardDrawableView extends View {
 
 	@Override
 	public boolean onTouchEvent(MotionEvent event) {
+
 		final int x = (int) event.getX();
 		final int y = (int) event.getY();
 		if(isHitBlockTrue(x, y)){
@@ -184,7 +196,7 @@ public class BoardDrawableView extends View {
 					//	Rect rect = new Rect();
 					//	rect.set(bounds.getBounds().left, bounds.getBounds().top,
 					//			bounds.getBounds().right, bounds.getBounds().bottom);
-					moving = (bounds.getBounds().intersects(x, y, x + 1, y + 1) && (!collision(bounds)));
+					moving = (bounds.getBounds().intersects(x, y, x + 1, y + 1));
 					invalidate();
 
 				}
@@ -200,70 +212,78 @@ public class BoardDrawableView extends View {
 					final int y_new = (int)event.getY();
 					if(bounds != null ){
 						if(bounds.getBounds() != null){
-							Rect temp = bounds.getBounds();
 							int width = Math.abs(bounds.getBounds().left - bounds.getBounds().right);
 							int height = Math.abs(bounds.getBounds().bottom - bounds.getBounds().top);
 							//TODO: fix bounds
 
-
+							boolean moveable = true;
 							if(horizontal(bounds)){
 								//System.out.println(range[0] +" , "+ range[1]);
-								
-								if((x_new - width/2 > x_new - width/2- range[0]) && (x_new + width/2 <x_new + width/2 + range[1])){
-									temp = bounds.getBounds();
+
+								if((x_new - width/2 > x_new - width/2- range[0]) && (x_new + width/2 <x_new + width/2 + range[1]) && moveable){
 									bounds.setBounds(x_new - width/2,
 											old_top,
 											x_new + width/2,
 											old_bottom);
 									invalidate();
-								} else if ((x_new - width/2 == x_new - width/2- range[0])) {
-									bounds.setBounds(old_left,
+								} if (x_new - width/2 == x_new - width/2- range[0])  {
+									moving = false;
+									moveable = false;
+									bounds.setBounds(old_left+2,
 											old_top,
-											x_new + width/2,
+											old_right+2,
 											old_bottom);
-									invalidate();
-								
-								} else if((x_new + width/2 ==x_new + width/2 + range[1])){
-									bounds.setBounds(x_new - width/2,
-											old_top,
-											old_right,
-											old_bottom);
+									
+									moveable = true;
 									invalidate();
 									
+
+								} else if((x_new + width/2 ==x_new + width/2 + range[1])){
+									moving =false;
+									moveable = false;
+									bounds.setBounds(old_left-2,
+											old_top,
+											old_right-2,
+											old_bottom);
+									
+									moveable = true;
+									invalidate();
+
 								}
 
 
 
 							}else{
-								System.out.println(range[0] +" , "+ range[1]);
-								
+
 								if((y_new - height/2 > y_new - height/2 - range[0]) &&(y_new + height/2<  y_new + height/2 + range[1])){
-									temp = bounds.getBounds();
-								
+									
+
 									bounds.setBounds(old_left,
 											y_new - height/2, 
 											old_right, 
 											y_new+ height/2);
 									invalidate();
 								}
-									else if((y_new + height/2 ==  y_new + height/2 + range[1])){
-										bounds.setBounds(old_left,
-												y_new - height/2, 
-												old_right, 
-												old_bottom);
-										invalidate();
-										
-										
-									
+								else if((y_new + height/2 ==  y_new + height/2 + range[1])){
+									moving =false;
+									bounds.setBounds(old_left,
+											old_top-2, 
+											old_right, 
+											old_bottom-2);
+									invalidate();
+
+
+
 
 								} else if((y_new - height/2 > y_new - height/2 - range[0])) {
+									moving =false;
 									bounds.setBounds(old_left,
-											old_top, 
+											y_new + height/2, 
 											old_right, 
 											y_new+ height/2);
 									invalidate();
-									
-									
+
+
 								}
 
 							}
@@ -313,6 +333,8 @@ public class BoardDrawableView extends View {
 				if(!shape.equals(shape2)){
 
 					if(horizontal(shape) == true){
+						maxleft = shape.getBounds().left;
+						maxright = widthScreen = shape.getBounds().right;
 						if(((shape.getBounds().top < shape2.getBounds().top) && (shape2.getBounds().top < shape.getBounds().bottom))|| 
 								((shape.getBounds().top < shape2.getBounds().bottom) && (shape2.getBounds().bottom <shape.getBounds().bottom))||
 								(((shape2.getBounds().top <= shape.getBounds().top) && (shape.getBounds().bottom <= shape2.getBounds().bottom)))){
@@ -330,6 +352,8 @@ public class BoardDrawableView extends View {
 
 
 					} else {
+						maxleft = shape.getBounds().top;
+						maxright = widthScreen = shape.getBounds().bottom;
 						if(((shape.getBounds().left < shape2.getBounds().left) && (shape2.getBounds().left <shape.getBounds().right))||
 								((shape.getBounds().left < shape2.getBounds().right) && (shape2.getBounds().right <shape.getBounds().right))
 								||((shape2.getBounds().left <= shape.getBounds().left)&&(shape.getBounds().right <= shape2.getBounds().right))){
@@ -392,14 +416,63 @@ public class BoardDrawableView extends View {
 
 	}
 
-	private boolean free(int x, int y, ShapeDrawable shape){
-		for(ShapeDrawable shape2 : shapes){
-			if(!shape.equals(shape2)){
-				if(shape2.getBounds().contains(x, y)){
-					return true;
-				}
-			} return false;
+	public String toString(){
+		StringBuilder s = new StringBuilder();
+		for(ShapeDrawable shape : shapes){
+			s.append(shape.getBounds().left);
+			s.append(":");
+			s.append(shape.getBounds().top);
+			s.append(":");
+			s.append(shape.getBounds().right);
+			s.append(":");
+			s.append(shape.getBounds().bottom);
+			s.append(",");
 		}
-		return false;
+
+		return s.toString();
+
 	}
+
+	public void resetShapes (String s){
+
+		//ArrayList<ShapeDrawable> sh = new ArrayList<ShapeDrawable>();
+		String[] temp1 = s.split(",");
+		shapes.clear();
+		
+		int count = 0;
+		for(int j = 0; j < temp1.length; j++){
+			System.out.println(temp1[j]);
+			String[] temp2 = temp1[j].split(":");
+			for (int i = 0; i < temp2.length; i = i+4) {
+				ShapeDrawable tempshape = new ShapeDrawable();
+				tempshape.setBounds(Integer.parseInt(temp2[i]), Integer.parseInt(temp2[i+1]), Integer.parseInt(temp2[i+2]),Integer.parseInt(temp2[i+3]));
+				System.out.println("Left : " + temp2[i]);
+				System.out.println("top : " + temp2[i+1]);
+				System.out.println("right : " + temp2[i+2]);
+				System.out.println("Bottom : " + temp2[i+3]);
+				tempshape.getPaint().setColor(m_colors[count++]);
+				System.out.println(i);
+				System.out.println(count);
+				shapes.add(tempshape);
+				//temp2 = null;
+				
+			}
+		}
+
+		
+		invalidate();
+
+		
+	}
+	@Override
+	 protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
+	        super.onMeasure(widthMeasureSpec, heightMeasureSpec);
+	        int size = Math.min(getMeasuredWidth(), getMeasuredHeight());
+	        widthScreen = size;
+	        heightScreen = size;
+	        setMeasuredDimension(size, size);
+	    }
+	
+
+
 }
