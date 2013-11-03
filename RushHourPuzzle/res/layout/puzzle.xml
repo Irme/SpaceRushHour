@@ -1,13 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/puzzle_layout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    android:id="@+id/puzzle_layout"
     tools:context=".PuzzleActivity" >
 
-   <!--  <shape android:shape="rectangle" >
+    <!--
+    <shape android:shape="rectangle" >
 
         <gradient
             android:angle="90"
@@ -27,44 +28,58 @@
             android:color="#FFFFFF" />
 
         <corners android:radius="8dp" />
-    </shape> -->
+    </shape>
+    -->
 
     <is.ru.app.puzzle.BoardDrawableView
-            android:id="@+id/boardview"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center"
-            android:background="#ffffff"
-            />
-
-<TableLayout
-    android:layout_width="match_parent"
-    android:layout_height="wrap_content" >
-
-    <TableRow
+        android:id="@+id/boardview"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:padding="5dip" >
+        android:layout_gravity="center"
+        android:layout_weight="0.17"
+        android:background="#ffffff" />
 
-        <Button
-            android:id="@+id/buttonPrevious"
-            android:layout_width="wrap_content"
+    <TableLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" >
+
+     <!--  <TableRow
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_weight="2.0"
-            android:buttonStyle="@style/button"
-            android:onClick="buttonPrevious"
-            android:text="@string/previous" />
+            android:padding="5dip" >
 
-        <Button
-            android:id="@+id/buttonNext"
-            android:layout_width="wrap_content"
-            android:layout_height="match_parent"
-            android:layout_gravity="center"
-            android:layout_weight="2.0"
-            android:buttonStyle="@style/button"
-            android:onClick="buttonNext"
-            android:text="@string/next" />
+         <TextView
+             android:layout_width="match_parent"
+             android:layout_height="wrap_content"
+             android:layout_weight="0.3"
+             android:text=" of " />
 
-    </TableRow>
-</TableLayout>
+        </TableRow> -->
+
+        <TableRow
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:padding="5dip" >
+
+            <Button
+                android:id="@+id/buttonPrevious"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="2.0"
+                android:buttonStyle="@style/button"
+                android:onClick="buttonPrevious"
+                android:text="@string/previous" />
+
+            <Button
+                android:id="@+id/buttonNext"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:layout_gravity="center"
+                android:layout_weight="2.0"
+                android:buttonStyle="@style/button"
+                android:onClick="buttonNext"
+                android:text="@string/next" />
+        </TableRow>
+    </TableLayout>
+
 </LinearLayout>
