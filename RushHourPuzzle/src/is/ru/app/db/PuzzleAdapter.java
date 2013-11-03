@@ -69,6 +69,17 @@ public class PuzzleAdapter {
 	        return value;
 	    }
 	    
+	    public long updatePuzzleSolved( int sid ) {
+	        String[] cols = DBHelper.TablePuzzlesCols;
+	        ContentValues contentValues = new ContentValues();
+	        contentValues.put( cols[1], ((Integer)sid).toString() );
+	        contentValues.put( cols[4], "1" );
+	        openToWrite();
+	        long value = db.update(DBHelper.TablePuzzles, contentValues, cols[1] + "=" + sid, null );
+	        close();
+	        return value;
+	    }
+	    
 	    public long updatePuzzleRestPlaying( ) {
 	        String[] cols = DBHelper.TablePuzzlesCols;
 	        ContentValues contentValues = new ContentValues();

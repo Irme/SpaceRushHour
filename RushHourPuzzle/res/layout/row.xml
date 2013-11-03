@@ -12,10 +12,7 @@
         android:singleLine="true"
         android:text="Puzzle nr.:" />
 
-    <Space
-        android:layout_width="5dip"
-        android:layout_height="match_parent"
-        android:singleLine="true" />
+  
     
     <TextView
         android:id="@+id/s_sid"
@@ -23,10 +20,7 @@
         android:layout_height="?android:attr/listPreferredItemHeight"
         android:singleLine="true" />
 
-    <Space
-        android:layout_width="5dip"
-        android:layout_height="match_parent"
-        android:singleLine="true" />
+
 
     <TextView
         android:id="@+id/s_setup"
@@ -34,10 +28,7 @@
         android:layout_height="?android:attr/listPreferredItemHeight"
         android:singleLine="true"/>
 
-    <Space
-        android:layout_width="5dip"
-        android:layout_height="match_parent"
-        android:singleLine="true" />
+ 
 
     <TextView
         android:layout_width="wrap_content"
@@ -46,10 +37,7 @@
         android:singleLine="true"
         android:text="Level:" />
 
-    <Space
-        android:layout_width="5dip"
-        android:layout_height="match_parent"
-        android:singleLine="true" />
+ 
 
     <TextView
         android:id="@+id/s_level"
@@ -57,10 +45,6 @@
         android:layout_height="?android:attr/listPreferredItemHeight"
         android:singleLine="true" />
 
-    <Space
-        android:layout_width="5dip"
-        android:layout_height="match_parent"
-        android:singleLine="true" />
 
     <TextView
         android:layout_width="wrap_content"
@@ -69,10 +53,6 @@
         android:singleLine="true"
         android:text="Solved:" />
 
-    <Space
-        android:layout_width="5dip"
-        android:layout_height="match_parent"
-        android:singleLine="true" />
 
   <ImageView
     android:id="@+id/s_solved"

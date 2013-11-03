@@ -7,16 +7,20 @@
     <TableRow
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        
         android:padding="5dip" >
 
         <TextView
             android:layout_width="match_parent"
-            android:layout_height="100dip" />
+            android:layout_height="200dip"
+            />
+
     </TableRow>
 
     <TableRow
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_gravity="center"
         android:padding="5dip" >
 
         <Button
@@ -50,7 +54,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:onClick="buttonOptions"
-            android:text="@string/Options" />
+            android:text="Options" />
 
     </TableRow>
 

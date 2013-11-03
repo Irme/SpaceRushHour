@@ -6,6 +6,7 @@ import android.database.Cursor;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
+import android.widget.TextView;
 
 
 public class PuzzleActivity extends Activity{
@@ -15,6 +16,7 @@ public class PuzzleActivity extends Activity{
 	private int puzzleId = 1;
 	private Button m_button_prev;
 	private Button m_button_next;
+	private TextView m_text_no_puzzle;
 	private int rotations;
 	
 	@Override
@@ -40,14 +42,18 @@ public class PuzzleActivity extends Activity{
 	    
 	    m_button_prev = (Button) findViewById( R.id.buttonPrevious );
 	    m_button_next = (Button) findViewById( R.id.buttonNext );
+	    m_text_no_puzzle = (TextView) findViewById( R.id.no_puzzle );
 	    
+	    String text = puzzleId + " of " + "40";
+	    m_text_no_puzzle.setText(text);
 	}
 	
 	public void buttonNext( View view )
     {
 		if ( puzzleId < 40 ){
-			System.out.println("Next " + puzzleId);
 			mBoardDrawableView.setUp(++puzzleId);
+		    String text = puzzleId + " of " + "40";
+		    m_text_no_puzzle.setText(text);
 			mBoardDrawableView.invalidate();
 		}
     }
@@ -56,6 +62,8 @@ public class PuzzleActivity extends Activity{
     {
 		if ( puzzleId > 1 ) {
 			mBoardDrawableView.setUp(--puzzleId);
+		    String text = puzzleId + " of " + "40";
+		    m_text_no_puzzle.setText(text);
 			mBoardDrawableView.invalidate();
 		}
     }
@@ -76,7 +84,6 @@ public class PuzzleActivity extends Activity{
 			puzzleId = cursor.getInt(1);
 		}
 		cursor.close();
-		mPuzzlesAdapter.close();
 	}
 
 	@Override

@@ -48,7 +48,7 @@ public class ListPuzzlesActivity extends ListActivity{
             }
         });
         setListAdapter( mCursorAdapter );
-        cursor.close();
+        //cursor.close();
 	 }
 	
 	 @Override
@@ -90,39 +90,4 @@ public class ListPuzzlesActivity extends ListActivity{
 			super.onDestroy();
 			mPuzzlesAdapter.close();
 		}
-	
-	 
-	/* private class PuzzleCursorAdapter extends SimpleCursorAdapter {
-		 
-		 private List<Puzzle> puzzles = new ArrayList<Puzzle>();
-
-		public PuzzleCursorAdapter(Context context, int textViewResourceId, Cursor cursor, String[] from, int[] to ) {
-			super(context, textViewResourceId, cursor, from, to);
-			for(int i = 0; i < cursor.getCount(); i++){//String id, String level, String length, String setup
-				Puzzle puzzle = new Puzzle(String.valueOf(cursor.getInt(i)), String.valueOf(cursor.getInt(i)), "0", cursor.getString(i));
-				this.puzzles.add(puzzle);
-			}
-		}
-			
-		@Override
-		 public View getView(int position, View convertView, ViewGroup parent) {
-			TextView result;
-			System.out.println("dfshfksdhfskdhf");
-            if (convertView == null) {
-                result = (TextView) getLayoutInflater().inflate(R.layout.row, parent, false);
-            } else {
-                result = (TextView) convertView;
-            }
-
-            final Puzzle puzzle = getItem(position);
-            result.setText(puzzle.toString());
-
-            return result;
-		}
-		
-		@Override
-		public Puzzle getItem(int pos){
-			return puzzles.get(pos);
-		}
-	 }*/
 }

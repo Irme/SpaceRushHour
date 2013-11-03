@@ -46,18 +46,13 @@ public class BoardDrawableView extends View {
 	private int width;
 	private boolean rotated = false;
 	private int rotations = 0;
-
+	public int puzzleId = 1;
 
 	// Blue colors
 	private Integer[] m_colors = { 0xffCC0000, 0xff0099CC, 0xff3399CC,
 			0xff6699CC, 0xff6633FF, 0xff0000CC, 0xff0033CC, 0xff6633CC,
 			0xff663366, 0xff33FFFF, 0xff339999, 0xff33CCFF, 0xff9999CC, 
 			0xff0066FF, 0xff3300FF, 0xff0066CC, 0xff333399, 0xff330066 };
-
-	private Integer[] m_green_colors = { 0xff33CC99, 0xff66CC99, 0xff99CC99,
-			0xff009966, 0xff339966, 0xff669966, 0xff999966, 0xff999933,
-			0xff999900, 0xff669933, 0xff666633, 0xff666600, 0xff336633,
-			0xff336600, 0xff006633, 0xff006600, 0xff006666, 0xff336666 };
 
 	Toast toast = Toast.makeText(getContext(), "BOING", Toast.LENGTH_SHORT);
 
@@ -68,6 +63,7 @@ public class BoardDrawableView extends View {
 	private int deltaX = 0, deltaY = 0;
 	private Vibrator v;
 	private double ratio = 0.85;
+	private boolean isSolved = false;
 
 	private static final String puzzleFile = "challenge_classic40.xml";
 
@@ -87,23 +83,14 @@ public class BoardDrawableView extends View {
 			heightScreen = (int) (heightScreen);
 			widthScreen = heightScreen;
 			rotated = true;
-
-
-
 		} else {
 			heightScreen = widthScreen;
 			rotated = false;
-
-
-
 		}
-		//	this.id = id;
-		//Read puzzle from db
-		//	readInPuzzle(id);
-		//	init();
 	}
 
 	public void setUp(int id){
+		puzzleId = id;
 		readInPuzzle(id);
 		init();
 	}
@@ -165,6 +152,7 @@ public class BoardDrawableView extends View {
 			Rect shape = new Rect(); // Or other Shape
 
 			ShapeDrawable shapeD = new ShapeDrawable();
+	
 			y = y * yOffset;
 			x = x * xOffset;
 
@@ -175,46 +163,17 @@ public class BoardDrawableView extends View {
 				shape.set(x, y, x + width, y + span);
 				shapeD.setBounds(shape);
 			}
-			//shapeD.getPaint().setStyle(Style.STROKE);
-			//shapeD.getPaint().setShader(makeLinear(shape.centerX(), shape.centerY()));
-
+	
 			shapeD.getPaint().setColor(m_colors[count++]);
-			// shapeD.setPadding(20, 20, 20, 20);
 			shapes.add(shapeD);
 		}
-	}
-
-	private static Shader makeLinear(int x, int y) {
-		return new RadialGradient (x, y, 50, new int[] { 0xFFFF0000, 0xFF00FF00, 0xFF0000FF },
-				null, Shader.TileMode.MIRROR);
-	}
-
-	private static Shader makeLinear() {
-		return new LinearGradient(0, 0, 50, 50,
-				new int[] { 0xFFFF0000, 0xFF00FF00, 0xFF0000FF },
-				null, Shader.TileMode.CLAMP);
-	}
-
-	private static Shader makeTiling() {
-		int[] pixels = new int[] { 0xFF00FF00, 0xFF0000FF,0xFFFF0000, 0};
-		Bitmap bm = Bitmap.createBitmap(pixels, 4, 4,
-				Bitmap.Config.ARGB_8888);
-
-		return new BitmapShader(bm, Shader.TileMode.REPEAT,
-				Shader.TileMode.REPEAT);
 	}
 
 	protected void onDraw(Canvas canvas) {
 		super.onDraw(canvas);
 		for (ShapeDrawable shape : shapes) {
-			//shape.getBounds().inset( (int)(shape.getBounds().width() * 0.01), (int)(shape.getBounds().height() * 0.01) );
 			shape.draw(canvas);
 		}
-		/*GradientDrawable g = new GradientDrawable(Orientation.LEFT_RIGHT, new int[] { Color.GREEN, Color.RED, Color.BLUE });
-		g.setGradientType(GradientDrawable.RADIAL_GRADIENT);
-		g.setGradientRadius(140.0f);
-		g.setGradientCenter(0.0f, 0.45f);
-		g.draw(canvas);*/
 	}
 
     @Override
@@ -226,12 +185,14 @@ public class BoardDrawableView extends View {
                     int range[] = maxRange(bounds);
                     switch (event.getAction()) {
                     case MotionEvent.ACTION_DOWN:
+                    //	v.vibrate(50); //vibrates when blocks are pressed
                             if (bounds != null) {
                                     //        Rect rect = new Rect();
                                     //        rect.set(bounds.getBounds().left, bounds.getBounds().top,
                                     //                        bounds.getBounds().right, bounds.getBounds().bottom);
                                     moving = (bounds.getBounds().intersects(x, y, x + 1, y + 1));
                                     invalidate();
+                                    
 
                             }
                             return true;
@@ -240,7 +201,15 @@ public class BoardDrawableView extends View {
                             int old_right = bounds.getBounds().right;
                             int old_top = bounds.getBounds().top;
                             int old_bottom = bounds.getBounds().bottom;
-
+                            if (bounds.getPaint().getColor() == 0xffCC0000) {
+                            	isSolved = isSolved(bounds);
+                            	if(isSolved){
+                            		puzzleId = puzzleId + 1;
+                            		setUp(puzzleId);
+                            		invalidate();
+                            		return true;
+                            	}
+                            }
                             if( bounds != null && moving ){
                                     final int x_new = (int)event.getX();
                                     final int y_new = (int)event.getY();
@@ -542,13 +511,15 @@ public class BoardDrawableView extends View {
 				shape.setBounds((int)(shape.getBounds().left*(1/ratio)), (int)(shape.getBounds().top*(1/ratio)), (int)(shape.getBounds().right*(1/ratio)), (int)(shape.getBounds().bottom*(1/ratio)));
 			}
 		}
-
-
 	}
 
-
-
-
-
-
+	public boolean isSolved(ShapeDrawable shape){
+		
+		if(shape.getBounds().right > widthScreen){
+			mPuzzlesAdapter.updatePuzzleSolved(puzzleId);
+			mPuzzlesAdapter.close();
+			return true;
+		}
+		return false;
+	}
 }
