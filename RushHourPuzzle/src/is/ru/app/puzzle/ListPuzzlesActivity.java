@@ -1,31 +1,22 @@
 package is.ru.app.puzzle;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.util.ArrayList;
-import java.util.List;
-
-import org.xmlpull.v1.XmlPullParserException;
-
-import android.app.Activity;
 import android.app.ListActivity;
-import android.content.Context;
 import android.content.Intent;
+import android.database.Cursor;
 import android.os.Bundle;
 import android.view.View;
-import android.view.ViewGroup;
-import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
+import android.widget.ImageView;
 import android.widget.ListView;
-import android.widget.TextView;
+import android.widget.SimpleCursorAdapter;
 import android.widget.Toast;
-
+import is.ru.app.db.PuzzleAdapter;
+import is.ru.app.db.DBHelper;
 
 
 public class ListPuzzlesActivity extends ListActivity{
 	
-	private List<Puzzle> puzzles = new ArrayList<Puzzle>();
-	private static final String puzzleFile = "challenge_classic40.xml";
+    private PuzzleAdapter mPuzzlesAdapter = new PuzzleAdapter( this );
+    private SimpleCursorAdapter mCursorAdapter;
 	
 	public ListPuzzlesActivity(){
 		
@@ -36,29 +27,35 @@ public class ListPuzzlesActivity extends ListActivity{
 		super.onCreate(savedInstanceState);
 		
 		setContentView(R.layout.puzzle_list);
-		readInPuzzle(puzzleFile);
-	//	final ListView listview = (ListView) findViewById(R.id.list);
-
-		PuzzleAdapter adapter = new PuzzleAdapter(this, android.R.layout.simple_list_item_1, puzzles);
-	    setListAdapter(adapter);
-	    
-	 /*   listview.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-
-			@Override
-			public void onItemClick(AdapterView<?> parent, View v, int position, long id) {
-				 Toast.makeText(getApplicationContext(),"Playing Puzzle " + (id + 1), Toast.LENGTH_LONG).show();
-				 Intent intent = new Intent(ListPuzzlesActivity.this, PuzzleActivity.class);
-				 intent.putExtra("id", (int)id);
-				 startActivity(intent);
-				}
-	    });*/
+   
+        Cursor cursor = mPuzzlesAdapter.queryPuzzles();
+  
+        String[] cols = DBHelper.TablePuzzlesCols;
+        String from[] = { cols[1], cols[3], cols[4] };
+        int to[] = { R.id.s_sid, R.id.s_level, R.id.s_solved };
+        startManagingCursor( cursor );
+        mCursorAdapter = new SimpleCursorAdapter(this, R.layout.row, cursor, from, to );
+        mCursorAdapter.setViewBinder( new SimpleCursorAdapter.ViewBinder() {
+            @Override
+            public boolean setViewValue(View view, Cursor cursor, int i) {
+                if ( i==4 ) {
+                    ((ImageView) view).setImageResource(
+                            (cursor.getInt(i) == 0) ? R.drawable.btn_check_buttonless_off : R.drawable.btn_check_buttonless_on );
+                    return true;
+                }
+                return false;
+            }
+        });
+        setListAdapter( mCursorAdapter );
 	 }
 	
 	 @Override
 	 public void onListItemClick(ListView l, View v, int position, long id) {
-		 Toast.makeText(getApplicationContext(),"Playing Puzzle " + (id + 1), Toast.LENGTH_LONG).show();
+		 String playing = R.string.playing_text + " " + (position + 1);
+		 Toast.makeText(getApplicationContext(), playing, Toast.LENGTH_LONG).show();
+		 mPuzzlesAdapter.updatePuzzleRestPlaying();
+		 mPuzzlesAdapter.updatePuzzle((int)(position + 1), true);
 		 Intent intent = new Intent(this, PuzzleActivity.class);
-		 intent.putExtra("id", (int)id);
 		 startActivity(intent);
 	 }
 	
@@ -83,53 +80,47 @@ public class ListPuzzlesActivity extends ListActivity{
 	    @Override
 	    protected void onRestart() {
 	        super.onRestart();
+	        mCursorAdapter.getCursor().requery();
 	    }
-	
-	 public void readInPuzzle(String puzzleFile){
-		PuzzleXmlParser xmlParser = new PuzzleXmlParser();
-		try {
-			InputStream in = getBaseContext().getAssets().open(puzzleFile);
-			xmlParser.parse(in);
-			puzzles = xmlParser.getPuzzles();
-		} catch (IOException e ) {
-			e.printStackTrace();
-		} catch ( XmlPullParserException xmlEx) {
-			xmlEx.printStackTrace();
+	    
+	    @Override
+	    protected void onDestroy() {
+			super.onDestroy();
+			mPuzzlesAdapter.close();
 		}
-	}
+	
 	 
-	 private class PuzzleAdapter extends ArrayAdapter<Puzzle> {
+	/* private class PuzzleCursorAdapter extends SimpleCursorAdapter {
 		 
 		 private List<Puzzle> puzzles = new ArrayList<Puzzle>();
 
-		public PuzzleAdapter(Context context, int textViewResourceId, List<Puzzle> objects) {
-			super(context, textViewResourceId, objects);
-			this.puzzles = objects;
+		public PuzzleCursorAdapter(Context context, int textViewResourceId, Cursor cursor, String[] from, int[] to ) {
+			super(context, textViewResourceId, cursor, from, to);
+			for(int i = 0; i < cursor.getCount(); i++){//String id, String level, String length, String setup
+				Puzzle puzzle = new Puzzle(String.valueOf(cursor.getInt(i)), String.valueOf(cursor.getInt(i)), "0", cursor.getString(i));
+				this.puzzles.add(puzzle);
+			}
 		}
-		
-	
+			
 		@Override
 		 public View getView(int position, View convertView, ViewGroup parent) {
 			TextView result;
-
+			System.out.println("dfshfksdhfskdhf");
             if (convertView == null) {
-                result = (TextView) getLayoutInflater().inflate(android.R.layout.simple_list_item_1, parent, false);
+                result = (TextView) getLayoutInflater().inflate(R.layout.row, parent, false);
             } else {
                 result = (TextView) convertView;
             }
 
             final Puzzle puzzle = getItem(position);
-            result.setText(puzzle.toString() );
+            result.setText(puzzle.toString());
 
             return result;
-			
 		}
 		
 		@Override
 		public Puzzle getItem(int pos){
 			return puzzles.get(pos);
 		}
-		 
-	 }
-
+	 }*/
 }

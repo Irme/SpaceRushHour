@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="horizontal" >
+
+    
+    <TextView
+        android:labelFor="@+id/s_sid"
+        android:layout_width="wrap_content"
+        android:layout_height="?android:attr/listPreferredItemHeight"
+        android:singleLine="true"
+        android:text="Puzzle nr.:" />
+
+    <Space
+        android:layout_width="5dip"
+        android:layout_height="match_parent"
+        android:singleLine="true" />
+    
+    <TextView
+        android:id="@+id/s_sid"
+        android:layout_width="wrap_content"
+        android:layout_height="?android:attr/listPreferredItemHeight"
+        android:singleLine="true" />
+
+    <Space
+        android:layout_width="5dip"
+        android:layout_height="match_parent"
+        android:singleLine="true" />
+
+    <TextView
+        android:id="@+id/s_setup"
+        android:layout_width="wrap_content"
+        android:layout_height="?android:attr/listPreferredItemHeight"
+        android:singleLine="true"/>
+
+    <Space
+        android:layout_width="5dip"
+        android:layout_height="match_parent"
+        android:singleLine="true" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="?android:attr/listPreferredItemHeight"
+        android:labelFor="@+id/s_level"
+        android:singleLine="true"
+        android:text="Level:" />
+
+    <Space
+        android:layout_width="5dip"
+        android:layout_height="match_parent"
+        android:singleLine="true" />
+
+    <TextView
+        android:id="@+id/s_level"
+        android:layout_width="wrap_content"
+        android:layout_height="?android:attr/listPreferredItemHeight"
+        android:singleLine="true" />
+
+    <Space
+        android:layout_width="5dip"
+        android:layout_height="match_parent"
+        android:singleLine="true" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="?android:attr/listPreferredItemHeight"
+        android:labelFor="@+id/s_solved"
+        android:singleLine="true"
+        android:text="Solved:" />
+
+    <Space
+        android:layout_width="5dip"
+        android:layout_height="match_parent"
+        android:singleLine="true" />
+
+  <ImageView
+    android:id="@+id/s_solved"
+    android:layout_width="wrap_content"
+    android:layout_height="?android:attr/listPreferredItemHeight"
+    android:layout_gravity="center"
+    android:layout_weight="1"
+    android:singleLine="true"
+    />
+
+</LinearLayout>
