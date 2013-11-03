@@ -4,6 +4,8 @@ import is.ru.app.db.PuzzleAdapter;
 import android.app.Activity;
 import android.database.Cursor;
 import android.os.Bundle;
+import android.widget.Button;
+import android.widget.LinearLayout;
 
 
 public class PuzzleActivity extends Activity{
@@ -11,7 +13,9 @@ public class PuzzleActivity extends Activity{
 	BoardDrawableView mBoardDrawableView;
 	private PuzzleAdapter mPuzzlesAdapter = new PuzzleAdapter( this );
 	private int puzzleId = 1;
-	
+	private Button m_button_prev;
+	private Button m_button_next;
+	private LinearLayout layout;
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -21,15 +25,20 @@ public class PuzzleActivity extends Activity{
 			puzzleId = cursor.getInt(1);
 		}
 		cursor.close();
+		layout = (LinearLayout) findViewById(R.id.puzzle_layout);
 		mBoardDrawableView = new BoardDrawableView(this, puzzleId);
 	    setContentView(mBoardDrawableView);
+	    
+	    mBoardDrawableView = (BoardDrawableView) findViewById( R.id.boardview );
 	    
 	    if ( savedInstanceState != null ) {
             String state = savedInstanceState.getString( "stateSAVED" );
             mBoardDrawableView.resetShapes(state);
         }
 	    
-	   
+	    //   m_button_prev = (Button) findViewById( R.id.buttonPrevious );
+	  //  m_button_next = (Button) findViewById( R.id.buttonNext );
+	    
 	}
 	
 	@Override

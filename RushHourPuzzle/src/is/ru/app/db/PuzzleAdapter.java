@@ -105,6 +105,7 @@ public class PuzzleAdapter {
 	    public int deletePuzzles( ) {
 	    	openToWrite();
 	        int result = db.delete(DBHelper.TablePuzzles, null, null);
+	        close();
 	        return result;
 	    }
 }
