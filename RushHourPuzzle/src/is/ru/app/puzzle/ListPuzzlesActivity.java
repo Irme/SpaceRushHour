@@ -47,6 +47,7 @@ public class ListPuzzlesActivity extends ListActivity{
             }
         });
         setListAdapter( mCursorAdapter );
+        cursor.close();
 	 }
 	
 	 @Override

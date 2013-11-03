@@ -27,10 +27,8 @@ public class MainActivity extends Activity {
 		setContentView(R.layout.main);
 		Cursor cursor = mPuzzlesAdapter.queryPuzzles();
 		if(cursor.getCount() == 0){
-			setUpData(cursor);
-		} else {
-			//checkData();
-		}
+			setUpData();
+		} 
 		cursor.close();
 	}
 
@@ -48,7 +46,7 @@ public class MainActivity extends Activity {
 	/*
 	 * Sets up data for the first time
 	 */
-	public void setUpData(Cursor cursor){
+	public void setUpData(){
 		mPuzzlesAdapter.deletePuzzles();
 		List<Puzzle> pList = readInPuzzle(puzzleFile);
 		for(Puzzle p : pList){
@@ -64,10 +62,9 @@ public class MainActivity extends Activity {
 			String s_setup = cursor2.getString(2);
 			if(s_setup.length() < 1){
 				mPuzzlesAdapter.deletePuzzles();
-				
 			}
 		  }
-		setUpData(cursor2);
+		setUpData();
 		cursor2.close();
 	}
 	
