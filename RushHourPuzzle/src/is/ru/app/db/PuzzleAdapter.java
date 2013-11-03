@@ -7,7 +7,7 @@ import android.database.sqlite.SQLiteDatabase;
 
 
 public class PuzzleAdapter {
-	 SQLiteDatabase db;
+	 	SQLiteDatabase db;
 	    DBHelper dbHelper;
 	    Context  context;
 
@@ -31,13 +31,14 @@ public class PuzzleAdapter {
 	        db.close();
 	    }
 
-	    public long insertPuzzle( int sid, String setup, int level, boolean solved ) {
+	    public long insertPuzzle( int sid, String setup, int level, boolean solved, boolean playing ) {
 	        String[] cols = DBHelper.TablePuzzlesCols;
 	        ContentValues contentValues = new ContentValues();
 	        contentValues.put( cols[1], ((Integer)sid).toString() );
 	        contentValues.put( cols[2], setup );
 	        contentValues.put( cols[3], level );
 	        contentValues.put( cols[4], solved ? "1" : "0" );
+	        contentValues.put( cols[5], playing ? "1" : "0" );
 	        openToWrite();
 	        long value = db.insert(DBHelper.TablePuzzles, null, contentValues );
 	        close();

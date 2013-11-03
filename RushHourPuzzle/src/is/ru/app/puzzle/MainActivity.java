@@ -51,7 +51,7 @@ public class MainActivity extends Activity {
 	public void setUpData(Cursor cursor){
 		List<Puzzle> pList = readInPuzzle(puzzleFile);
 		for(Puzzle p : pList){
-			mPuzzlesAdapter.insertPuzzle( Integer.parseInt(p.id), p.setup,Integer.parseInt(p.level), false);
+			mPuzzlesAdapter.insertPuzzle( Integer.parseInt(p.id), p.setup, Integer.parseInt(p.level), false, false);
 		}
 	}
 	

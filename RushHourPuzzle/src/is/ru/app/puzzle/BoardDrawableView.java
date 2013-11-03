@@ -22,6 +22,7 @@ import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapShader;
 import android.graphics.Canvas;
+import android.graphics.LinearGradient;
 import android.graphics.RadialGradient;
 import android.graphics.Shader;
 import android.graphics.SweepGradient;
@@ -78,7 +79,6 @@ public class BoardDrawableView extends View {
 			
 		} else {
 			heightScreen = widthScreen;
-
 		}
 		this.id = id;
 		//Read puzzle from db
@@ -110,6 +110,7 @@ public class BoardDrawableView extends View {
 	public void createBoxes(Puzzle puzzle) {
 		Pattern pattern = Pattern.compile("\\d+");
 		String setup = puzzle.setup;
+		System.out.println("setup " + setup);
 		LinkedList<String> items = new LinkedList<String>(Arrays.asList(setup.split(",")));
 
 		for (String s : items) {
