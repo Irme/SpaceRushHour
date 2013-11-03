@@ -42,8 +42,8 @@ public class BoardDrawableView extends View {
 	private PuzzleAdapter mPuzzlesAdapter = new PuzzleAdapter( this.getContext() );
 
 	private int id = 0;
-	private double ratio;
 	private int width;
+
 
 	// Blue colors
 	private Integer[] m_colors = { 0xffCC0000, 0xff0099CC, 0xff3399CC,
@@ -63,6 +63,7 @@ public class BoardDrawableView extends View {
 	private boolean moving = false;
 	private int startX = 0, startY = 0, endX = 0, endY = 0;
 	private int deltaX = 0, deltaY = 0;
+	private Vibrator v;
 
 	private static final String puzzleFile = "challenge_classic40.xml";
 
@@ -73,16 +74,18 @@ public class BoardDrawableView extends View {
 	public BoardDrawableView(Context context, int id) {
 		super(context);
 		DisplayMetrics metrics = context.getResources().getDisplayMetrics();
-
+		v = (Vibrator) context.getApplicationContext().getSystemService(Context.VIBRATOR_SERVICE);
+		//OptionActivity opt = new OptionActivity();
+		
 		widthScreen = metrics.widthPixels;
 		heightScreen = metrics.heightPixels;
 		if(widthScreen > heightScreen){
 			heightScreen = (int) (heightScreen);
 			widthScreen = heightScreen;
 			
-
 			
-
+			
+			
 		} else {
 			heightScreen = widthScreen;
 
@@ -206,6 +209,12 @@ public class BoardDrawableView extends View {
 
 	@Override
 	public boolean onTouchEvent(MotionEvent event) {
+		
+		// Get instance of Vibrator from current Context
+		
+
+		// Vibrate for 300 milliseconds
+		
 		final int x = (int) event.getX();
 		final int y = (int) event.getY();
 		if(isHitBlockTrue(x, y)){
@@ -213,6 +222,8 @@ public class BoardDrawableView extends View {
 			int range[] = maxRange(bounds);
 			switch (event.getAction()) {
 			case MotionEvent.ACTION_DOWN:
+//				if()
+//				v.vibrate(50);
 				if (bounds != null) {
 					//	Rect rect = new Rect();
 					//	rect.set(bounds.getBounds().left, bounds.getBounds().top,
@@ -327,6 +338,9 @@ public class BoardDrawableView extends View {
 						if(((shape.getBounds().top <= shape2.getBounds().top) && (shape2.getBounds().top < shape.getBounds().bottom))|| 
 								((shape.getBounds().top < shape2.getBounds().bottom) && (shape2.getBounds().bottom <=shape.getBounds().bottom))||
 								(((shape2.getBounds().top <= shape.getBounds().top) && (shape.getBounds().bottom <= shape2.getBounds().bottom)))){
+							
+							
+							
 							if((shape2.getBounds().left - shape.getBounds().right) < (shape.getBounds().left - shape2.getBounds().right)){
 								//It's to the right from our current brick
 								maxleft = Math.min(maxleft,Math.abs((shape.getBounds().left-shape2.getBounds().right)));
@@ -346,6 +360,8 @@ public class BoardDrawableView extends View {
 						if(((shape.getBounds().left <= shape2.getBounds().left) && (shape2.getBounds().left <shape.getBounds().right))||
 								((shape.getBounds().left < shape2.getBounds().right) && (shape2.getBounds().right <=shape.getBounds().right))
 								||((shape2.getBounds().left <= shape.getBounds().left)&&(shape.getBounds().right <= shape2.getBounds().right))){
+							
+							
 							if((shape2.getBounds().bottom -shape.getBounds().top)<(shape.getBounds().bottom -shape2.getBounds().top)){
 								//It's above from our current brick
 								maxleft = Math.min(maxleft, Math.abs((shape2.getBounds().bottom-shape.getBounds().top)));
