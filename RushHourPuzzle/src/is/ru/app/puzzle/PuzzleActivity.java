@@ -79,5 +79,10 @@ public class PuzzleActivity extends Activity{
         	System.out.println("Empty state.");
         }
     }
+    @Override
+       public void onContentChanged() {
+         // TODO Auto-generated method stub
+        //super.onContentChanged();
+      }
    
 	}
