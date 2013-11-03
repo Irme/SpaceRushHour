@@ -41,7 +41,6 @@ public class BoardDrawableView extends View {
 	private List<ShapeDrawable> shapes = new ArrayList<ShapeDrawable>();
 	private PuzzleAdapter mPuzzlesAdapter = new PuzzleAdapter( this.getContext() );
 
-	private int id = 0;
 	private int width;
 
 
@@ -71,8 +70,8 @@ public class BoardDrawableView extends View {
 	// (H 4 4 2), (V 5 0 3)</setup>
 	Map<String, LinkedList<Integer>> boxes = new LinkedHashMap<String, LinkedList<Integer>>();
 
-	public BoardDrawableView(Context context, int id) {
-		super(context);
+	public BoardDrawableView(Context context, AttributeSet attrs) {
+        super(context, attrs);
 		DisplayMetrics metrics = context.getResources().getDisplayMetrics();
 		v = (Vibrator) context.getApplicationContext().getSystemService(Context.VIBRATOR_SERVICE);
 		//OptionActivity opt = new OptionActivity();
@@ -92,8 +91,13 @@ public class BoardDrawableView extends View {
 
 
 		}
-		this.id = id;
+	//	this.id = id;
 		//Read puzzle from db
+	//	readInPuzzle(id);
+	//	init();
+	}
+	
+	public void setUp(int id){
 		readInPuzzle(id);
 		init();
 	}
@@ -120,9 +124,9 @@ public class BoardDrawableView extends View {
 	// <setup>(H 1 2 2), (V 0 1 3), (H 0 0 2), (V 3 1 3), (H 2 5 3), (V 0 4 2),
 	// (H 4 4 2), (V 5 0 3)</setup>
 	public void createBoxes(Puzzle puzzle) {
+		boxes.clear();
 		Pattern pattern = Pattern.compile("\\d+");
 		String setup = puzzle.setup;
-		System.out.println("setup " + setup);
 		LinkedList<String> items = new LinkedList<String>(Arrays.asList(setup.split(",")));
 
 		for (String s : items) {
@@ -144,7 +148,7 @@ public class BoardDrawableView extends View {
 		int xOffset = width;
 		int yOffset = width;
 		int count = 0;
-
+		shapes.clear();
 		for (Map.Entry<String, LinkedList<Integer>> entry : boxes.entrySet()) {
 			String key = entry.getKey();
 			LinkedList<Integer> values = entry.getValue();
@@ -207,8 +211,21 @@ public class BoardDrawableView extends View {
 		g.draw(canvas);*/
 	}
 
-	@Override
-	public boolean onTouchEvent(MotionEvent event) {
+    @Override
+    public boolean onTouchEvent(MotionEvent event) {
+            final int x = (int) event.getX();
+            final int y = (int) event.getY();
+            if(isHitBlockTrue(x, y)){
+                    final ShapeDrawable bounds = isHitBlock(x, y);
+                    int range[] = maxRange(bounds);
+                    switch (event.getAction()) {
+                    case MotionEvent.ACTION_DOWN:
+                            if (bounds != null) {
+                                    //        Rect rect = new Rect();
+                                    //        rect.set(bounds.getBounds().left, bounds.getBounds().top,
+                                    //                        bounds.getBounds().right, bounds.getBounds().bottom);
+                                    moving = (bounds.getBounds().intersects(x, y, x + 1, y + 1));
+                                    invalidate();
 		
 		// Get instance of Vibrator from current Context
 		
@@ -231,13 +248,15 @@ public class BoardDrawableView extends View {
 					moving = (bounds.getBounds().intersects(x, y, x + 1, y + 1));
 					invalidate();
 
-				}
-				return true;
-			case MotionEvent.ACTION_MOVE:
-				int old_left = bounds.getBounds().left;
-				int old_right = bounds.getBounds().right;
-				int old_top = bounds.getBounds().top;
-				int old_bottom = bounds.getBounds().bottom;
+                            if( bounds != null && moving ){
+                                    final int x_new = (int)event.getX();
+                                    final int y_new = (int)event.getY();
+                                    if(bounds != null ){
+                                            if(bounds.getBounds() != null){
+                                                    //width = (int)((widthScreen / 6)*ratio);
+                                                    int width = Math.abs(bounds.getBounds().left - bounds.getBounds().right);
+                                                    int height = Math.abs(bounds.getBounds().bottom - bounds.getBounds().top);
+                                                    //TODO: fix bounds
 
 				if( bounds != null && moving ){
 					final int x_new = (int)event.getX();
@@ -277,7 +296,7 @@ public class BoardDrawableView extends View {
 									invalidate();
 									return true;
 
-								}
+                                            } 
 							}else{
 								System.out.println(range[0] +" , "+ range[1]);
 								if((y_new - height/2 > y_new - height/2 - range[0]) &&(y_new + height/2<  y_new + height/2 + range[1])){
@@ -323,6 +342,61 @@ public class BoardDrawableView extends View {
 	}      
 
 
+	
+/*	private int [] maxRange(ShapeDrawable shape){
+		//First entry is left/up moving range, second entry is right/down moving range.
+		if(shape != null){
+			int maxleft = widthScreen;
+			int maxright = widthScreen;
+			int maxtop = 0;
+			int maxbottom = getHeight();
+			int new_max_left = Integer.MAX_VALUE;
+			int new_max_right = Integer.MAX_VALUE;
+			int [] range = new int[2];
+			for (ShapeDrawable shape2 : shapes){
+				if(!shape.equals(shape2)){
+
+					if(horizontal(shape) == true){
+					
+							if((shape.getBounds().top < shape2.getBounds().bottom) && (shape.getBounds().bottom > shape2.getBounds().top)){
+								//It's to the right from our current brick
+								
+								maxleft = Math.min(maxleft, Math.abs((shape.getBounds().left - shape2.getBounds().right)));
+								//System.out.println("horizontal right bound detected");
+								new_max_left = Math.min(maxleft, new_max_left);
+																
+								
+								maxright = Math.min(maxright, Math.abs(shape.getBounds().right - shape2.getBounds().left));
+								
+								new_max_right = Math.min(maxright, new_max_right);
+								
+								range [0] = new_max_left;
+								range [1] = new_max_right;
+							}
+
+					} else {
+						maxtop = getHeight();
+						maxbottom = getHeight();
+					
+							if((shape.getBounds().top < shape2.getBounds().bottom) && (shape.getBounds().bottom > shape2.getBounds().top)){
+								//It's to the right from our current brick
+								maxbottom = Math.min(maxbottom, Math.abs((shape2.getBounds().top - shape2.getBounds().top)));
+								//System.out.println("horizontal right bound detected");
+							
+								maxtop = Math.min(maxtop, Math.abs((shape2.getBounds().bottom - shape.getBounds().top)));
+								range [0] = maxtop;
+								range [1] = maxbottom;
+							}
+
+					}
+	
+				}
+
+			}
+			return range;
+		}
+		return null;
+	}*/
 	private int [] maxRange(ShapeDrawable shape){
 		//First entry is left/up moving range, second entry is right/down moving range.
 		if(shape != null){
