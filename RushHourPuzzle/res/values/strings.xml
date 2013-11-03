@@ -8,5 +8,7 @@
     <string name="puzzleList">Puzzles</string>
     <string name="puzzle_list_title">Puzzles</string>
     <string name="playing_text">Playing Puzzle </string>
+    <string name="Options">buttonOptions</string>
+    <string name="vibration">vibrationButton</string>
 
 </resources>

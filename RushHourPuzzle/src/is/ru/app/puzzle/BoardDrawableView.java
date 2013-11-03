@@ -30,6 +30,7 @@ import android.graphics.SweepGradient;
 import android.graphics.Rect;
 import android.graphics.drawable.ShapeDrawable;
 import android.os.Bundle;
+import android.os.Vibrator;
 import android.util.DisplayMetrics;
 import android.view.MotionEvent;
 import android.view.View;
@@ -39,7 +40,8 @@ public class BoardDrawableView extends View {
 
 	private List<ShapeDrawable> shapes = new ArrayList<ShapeDrawable>();
 	private PuzzleAdapter mPuzzlesAdapter = new PuzzleAdapter( this.getContext() );
-	
+	PuzzleActivity p = new PuzzleActivity();
+
 	private int id = 0;
 	private double ratio;
 	private int width;
@@ -79,14 +81,14 @@ public class BoardDrawableView extends View {
 			heightScreen = (int) (heightScreen);
 			widthScreen = heightScreen;
 			width = (int)((widthScreen / 6)*ratio);
-			
+
 			ratio = 0.75;
-			
+
 		} else {
 			heightScreen = widthScreen;
-			
+
 			ratio = 1;
-			
+
 
 		}
 		this.id = id;
@@ -94,22 +96,22 @@ public class BoardDrawableView extends View {
 		readInPuzzle(id);
 		init();
 	}
-	
+
 	public void readInPuzzle(int id){
 		Cursor cursor = mPuzzlesAdapter.queryPuzzle(id);
 		System.out.println("id " + id);
 		while(cursor.moveToNext())
-		  {
+		{
 			int s_id = cursor.getInt(1);
 			String s_setup = cursor.getString(2);
 			String s_level = String.valueOf(cursor.getInt(3));
 			String s_length = String.valueOf(cursor.getInt(4));
 			boolean s_solved = cursor.getInt(4) == 0 ? false : true;
 			Puzzle puzzle = new Puzzle(String.valueOf(id), s_setup, s_level, s_length, s_solved, true);
-		//	mPuzzlesAdapter.updatePuzzleRestPlaying();
+			//	mPuzzlesAdapter.updatePuzzleRestPlaying();
 			mPuzzlesAdapter.updatePuzzle(s_id, true);
 			createBoxes(puzzle);
-		  }
+		}
 		cursor.close();
 	}
 
@@ -132,7 +134,7 @@ public class BoardDrawableView extends View {
 			boxes.put(s.trim(), box);
 		}
 	}
-	
+
 
 	protected void init() {
 		width = (int)((widthScreen / 6)*ratio);
@@ -164,17 +166,17 @@ public class BoardDrawableView extends View {
 			}
 			//shapeD.getPaint().setStyle(Style.STROKE);
 			//shapeD.getPaint().setShader(makeLinear(shape.centerX(), shape.centerY()));
-		
+
 			shapeD.getPaint().setColor(m_colors[count++]);
 			// shapeD.setPadding(20, 20, 20, 20);
 			shapes.add(shapeD);
 		}
 	}
 
-     private static Shader makeLinear(int x, int y) {
-         return new RadialGradient (x, y, 50, new int[] { 0xFFFF0000, 0xFF00FF00, 0xFF0000FF },
-                           null, Shader.TileMode.MIRROR);
-     }
+	private static Shader makeLinear(int x, int y) {
+		return new RadialGradient (x, y, 50, new int[] { 0xFFFF0000, 0xFF00FF00, 0xFF0000FF },
+				null, Shader.TileMode.MIRROR);
+	}
 
 	private static Shader makeLinear() {
 		return new LinearGradient(0, 0, 50, 50,
@@ -206,7 +208,8 @@ public class BoardDrawableView extends View {
 
 	@Override
 	public boolean onTouchEvent(MotionEvent event) {
-
+		Vibrator v = (Vibrator) p.getSystemService(Context.VIBRATOR_SERVICE);
+		v.vibrate(500);
 		final int x = (int) event.getX();
 		final int y = (int) event.getY();
 		if(isHitBlockTrue(x, y)){
@@ -234,7 +237,7 @@ public class BoardDrawableView extends View {
 					final int y_new = (int)event.getY();
 					if(bounds != null ){
 						if(bounds.getBounds() != null){
-							width = (int)((widthScreen / 6)*ratio);
+							//width = (int)((widthScreen / 6)*ratio);
 							//width = Math.abs(bounds.getBounds().left - bounds.getBounds().right);
 							int height = Math.abs(bounds.getBounds().bottom - bounds.getBounds().top);
 							//TODO: fix bounds
@@ -256,10 +259,10 @@ public class BoardDrawableView extends View {
 											old_top,
 											old_right+2,
 											old_bottom);
-									
+
 									moveable = true;
 									invalidate();
-									
+
 
 								} else if((x_new + width/2 ==x_new + width/2 + range[1])){
 									moving =false;
@@ -268,7 +271,7 @@ public class BoardDrawableView extends View {
 											old_top,
 											old_right-2,
 											old_bottom);
-									
+
 									moveable = true;
 									invalidate();
 
@@ -279,7 +282,7 @@ public class BoardDrawableView extends View {
 							}else{
 
 								if((y_new - height/2 > y_new - height/2 - range[0]) &&(y_new + height/2<  y_new + height/2 + range[1])){
-									
+
 
 									bounds.setBounds(old_left,
 											y_new - height/2, 
@@ -326,7 +329,7 @@ public class BoardDrawableView extends View {
 		}
 	}      
 
-	
+
 	private int [] maxRange(ShapeDrawable shape){
 		//First entry is left/up moving range, second entry is right/down moving range.
 		if(shape != null){
@@ -442,7 +445,7 @@ public class BoardDrawableView extends View {
 		//ArrayList<ShapeDrawable> sh = new ArrayList<ShapeDrawable>();
 		String[] temp1 = s.split(",");
 		shapes.clear();
-		
+
 		int count = 0;
 		for(int j = 0; j < temp1.length; j++){
 			System.out.println(temp1[j]);
@@ -459,42 +462,41 @@ public class BoardDrawableView extends View {
 				System.out.println(count);
 				shapes.add(tempshape);
 				//temp2 = null;
-				
+
 			}
 		}
 
-		
+
 		invalidate();
 
-		
+
 	}
 	@Override
-	 protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
-	        super.onMeasure(widthMeasureSpec, heightMeasureSpec);
-	        int size = Math.min(getMeasuredWidth(), getMeasuredHeight());
-	        widthScreen = size;
-	        heightScreen = size;
-	        setMeasuredDimension(size, size);
-	    }
-	
-	 protected void onSizeChanged(int xNew, int yNew, int xOld, int yOld) {
-		 int size = Math.min(getMeasuredWidth(), getMeasuredHeight());
-	        widthScreen = size;
-	        heightScreen = size;
-	        if(widthScreen > heightScreen){
-				heightScreen = (int) (heightScreen);
-				widthScreen = heightScreen;
-				width = (int)((widthScreen / 6)*ratio);
-				
-				ratio = 0.75;
-				
-			} else {
-				heightScreen = widthScreen;
-				
-				ratio = 1;
-				
+	protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
+		super.onMeasure(widthMeasureSpec, heightMeasureSpec);
+		int size = Math.min(getMeasuredWidth(), getMeasuredHeight());
+		widthScreen = size;
+		heightScreen = size;
+		setMeasuredDimension(size, size);
+	}
 
-			}
-	        
-	    }
+	protected void onSizeChanged(int xNew, int yNew, int xOld, int yOld) {
+		//		 int size = Math.min(getMeasuredWidth(), getMeasuredHeight());
+		//	        widthScreen = size;
+		//	        heightScreen = size;
+		//	        if(widthScreen > heightScreen){
+		//				heightScreen = (int) (heightScreen);
+		//				widthScreen = heightScreen;
+		//				width = (int)((widthScreen / 6)*ratio);
+		//				ratio = 0.75;
+		//			} else {
+		//				heightScreen = widthScreen;
+		//				ratio = 1;
+		//			}
+		//	        
+		//	    }
+		for (ShapeDrawable shape : shapes) {
+			shape.setBounds((int)(shape.getBounds().left*0.9), (int)(shape.getBounds().top*0.9), (int)(shape.getBounds().right*0.9), (int)(shape.getBounds().bottom*0.9));
+		}
+	}
 }

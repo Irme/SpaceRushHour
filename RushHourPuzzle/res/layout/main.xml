@@ -23,7 +23,7 @@
             android:id="@+id/buttonPlay"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:buttonStyle="@style/button"
+     
             android:onClick="buttonPlay"
             android:text="@string/play" />
     </TableRow>
@@ -39,6 +39,19 @@
             android:layout_height="wrap_content"
             android:onClick="buttonPuzzleList"
             android:text="@string/puzzleList" />
+    </TableRow>
+
+    <TableRow
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" 
+        android:padding="5dip" >
+        <Button
+            android:id="@+id/buttonOptions"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:onClick="buttonOptions"
+            android:text="@string/Options" />
+
     </TableRow>
 
 </LinearLayout>

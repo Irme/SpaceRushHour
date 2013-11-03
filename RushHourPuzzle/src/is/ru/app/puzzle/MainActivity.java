@@ -80,6 +80,12 @@ public class MainActivity extends Activity {
 	    Intent intent = new Intent(this, ListPuzzlesActivity.class);
 	    startActivity(intent);
 	}
+	
+	public void buttonOptions(View view){
+		Intent intent = new Intent(this, OptionActivity.class);
+	    startActivity(intent);
+		
+	}
 
 	@Override
 	protected void onPause() {
