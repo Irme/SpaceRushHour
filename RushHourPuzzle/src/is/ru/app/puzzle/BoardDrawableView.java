@@ -217,120 +217,112 @@ public class BoardDrawableView extends View {
 		g.draw(canvas);*/
 	}
 
-	@Override
-	public boolean onTouchEvent(MotionEvent event) {
+    @Override
+    public boolean onTouchEvent(MotionEvent event) {
+            final int x = (int) event.getX();
+            final int y = (int) event.getY();
+            if(isHitBlockTrue(x, y)){
+                    final ShapeDrawable bounds = isHitBlock(x, y);
+                    int range[] = maxRange(bounds);
+                    switch (event.getAction()) {
+                    case MotionEvent.ACTION_DOWN:
+                            if (bounds != null) {
+                                    //        Rect rect = new Rect();
+                                    //        rect.set(bounds.getBounds().left, bounds.getBounds().top,
+                                    //                        bounds.getBounds().right, bounds.getBounds().bottom);
+                                    moving = (bounds.getBounds().intersects(x, y, x + 1, y + 1));
+                                    invalidate();
 
-		// Get instance of Vibrator from current Context
+                            }
+                            return true;
+                    case MotionEvent.ACTION_MOVE:
+                            int old_left = bounds.getBounds().left;
+                            int old_right = bounds.getBounds().right;
+                            int old_top = bounds.getBounds().top;
+                            int old_bottom = bounds.getBounds().bottom;
 
+                            if( bounds != null && moving ){
+                                    final int x_new = (int)event.getX();
+                                    final int y_new = (int)event.getY();
+                                    if(bounds != null ){
+                                            if(bounds.getBounds() != null){
+                                                    //width = (int)((widthScreen / 6)*ratio);
+                                                    width = Math.abs(bounds.getBounds().left - bounds.getBounds().right);
+                                                    int height = Math.abs(bounds.getBounds().bottom - bounds.getBounds().top);
+                                                    //TODO: fix bounds
 
-		// Vibrate for 300 milliseconds
+                                                    boolean onlyL = false;
+                                                    boolean onlyR = false;
+                                                    boolean onlyU = false;
+                                                    boolean onlyD = false;
+                                            
+                                                    if(horizontal(bounds)){
+                                                            System.out.println(range[0] +" , "+ range[1]);
+                                                            if(((x_new - width/2) > (x_new - width/2- range[0])) && ((x_new + width/2) <(x_new + width/2 + range[1])) && !onlyR && !onlyL && !onlyU && !onlyD){
+                                                                    bounds.setBounds(x_new - width/2,
+                                                                                    old_top,
+                                                                                    x_new + width/2,
+                                                                                    old_bottom);
+                                                                    invalidate();
+                                                            } if ((range[0]<=0) && (x_new > bounds.getBounds().centerX()))  {
+                                                                    bounds.setBounds(x_new - width/2,
+                                                                                    old_top,
+                                                                                    x_new + width/2,
+                                                                                    old_bottom);
+                                                                    invalidate();
+                                                                    return true;
+                                                            } else if((range[1]<=0) && (x_new < bounds.getBounds().centerX())){
+                                                                    bounds.setBounds(x_new - width/2,
+                                                                                    old_top,
+                                                                                    x_new + width/2,
+                                                                                    old_bottom);
+                                                                    invalidate();
+                                                                    return true;
 
-		final int x = (int) event.getX();
-		final int y = (int) event.getY();
-		if(isHitBlockTrue(x, y)){
-			final ShapeDrawable bounds = isHitBlock(x, y);
-			int range[] = maxRange(bounds);
-			switch (event.getAction()) {
-			case MotionEvent.ACTION_DOWN:
-				//				if()
-				//				v.vibrate(50);
-				if (bounds != null) {
-					//	Rect rect = new Rect();
-					//	rect.set(bounds.getBounds().left, bounds.getBounds().top,
-					//			bounds.getBounds().right, bounds.getBounds().bottom);
-					moving = (bounds.getBounds().intersects(x, y, x + 1, y + 1));
-					invalidate();
+                                                            }
+                                                    }else{
+                                                            System.out.println(range[0] +" , "+ range[1]);
+                                                            if((y_new - height/2 > y_new - height/2 - range[0]) &&(y_new + height/2<  y_new + height/2 + range[1])){
+                                                                    bounds.setBounds(old_left,
+                                                                                    y_new - height/2, 
+                                                                                    old_right, 
+                                                                                    y_new+ height/2);
+                                                                    invalidate();
+                                                            }
+                                                            else if((range[0]<=0) && (y_new > bounds.getBounds().centerY())){
+                                                                    bounds.setBounds(old_left,
+                                                                                    y_new - height/2, 
+                                                                                    old_right, 
+                                                                                    y_new+ height/2);
+                                                                    invalidate();
+                                                                    return true;
 
-				}
-				return true;
-			case MotionEvent.ACTION_MOVE:
-				int old_left = bounds.getBounds().left;
-				int old_right = bounds.getBounds().right;
-				int old_top = bounds.getBounds().top;
-				int old_bottom = bounds.getBounds().bottom;
+                                                            } else if((range[1]<=0) && (y_new < bounds.getBounds().centerY())) {
+                                                                    bounds.setBounds(old_left,
+                                                                                    y_new - height/2, 
+                                                                                    old_right, 
+                                                                                    y_new+ height/2);
+                                                                    invalidate();
+                                                                    return true;
+                                                            }
 
-				if( bounds != null && moving ){
-					final int x_new = (int)event.getX();
-					final int y_new = (int)event.getY();
-					if(bounds != null ){
-						if(bounds.getBounds() != null){
-							//width = (int)((widthScreen / 6)*ratio);
-							//width = Math.abs(bounds.getBounds().left - bounds.getBounds().right);
-							int height = Math.abs(bounds.getBounds().bottom - bounds.getBounds().top);
-							//TODO: fix bounds
+                                                    }
 
-							boolean onlyL = false;
-							boolean onlyR = false;
-							boolean onlyU = false;
-							boolean onlyD = false;
+                                            } 
 
-							if(horizontal(bounds)){
-								System.out.println(range[0] +" , "+ range[1]);
-								if(((x_new - width/2) > (x_new - width/2- range[0])) && ((x_new + width/2) <(x_new + width/2 + range[1])) && !onlyR && !onlyL && !onlyU && !onlyD){
-									bounds.setBounds(x_new - width/2,
-											old_top,
-											x_new + width/2,
-											old_bottom);
-									invalidate();
-								} if ((range[0]<=0) && (x_new > bounds.getBounds().centerX()))  {
-									bounds.setBounds(x_new - width/2,
-											old_top,
-											x_new + width/2,
-											old_bottom);
-									invalidate();
-									return true;
-								} else if((range[1]<=0) && (x_new < bounds.getBounds().centerX())){
-									bounds.setBounds(x_new - width/2,
-											old_top,
-											x_new + width/2,
-											old_bottom);
-									invalidate();
-									return true;
-
-								}
-							}else{
-								System.out.println(range[0] +" , "+ range[1]);
-								if((y_new - height/2 > y_new - height/2 - range[0]) &&(y_new + height/2<  y_new + height/2 + range[1])){
-									bounds.setBounds(old_left,
-											y_new - height/2, 
-											old_right, 
-											y_new+ height/2);
-									invalidate();
-								}
-								else if((range[0]<=0) && (y_new > bounds.getBounds().centerY())){
-									bounds.setBounds(old_left,
-											y_new - height/2, 
-											old_right, 
-											y_new+ height/2);
-									invalidate();
-									return true;
-
-								} else if((range[1]<=0) && (y_new < bounds.getBounds().centerY())) {
-									bounds.setBounds(old_left,
-											y_new - height/2, 
-											old_right, 
-											y_new+ height/2);
-									invalidate();
-									return true;
-								}
-
-							}
-
-						} 
-
-					}
-				}
-				return true;
-			case MotionEvent.ACTION_UP:
-				moving = false;
-				return true;
-			}
-			return false;
-		}
-		else{
-			return false;
-		}
-	}      
+                                    }
+                            }
+                            return true;
+                    case MotionEvent.ACTION_UP:
+                            moving = false;
+                            return true;
+                    }
+                    return false;
+            }
+            else{
+                    return false;
+            }
+    }     
 
 
 	
