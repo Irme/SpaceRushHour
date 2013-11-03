@@ -95,8 +95,8 @@ public class MainActivity extends Activity {
 	}
 	
 	public void buttonOptions(View view){
-		Intent intent = new Intent(this, OptionActivity.class);
-	    startActivity(intent);
+		//Intent intent = new Intent(this, OptionActivity.class);
+	  //  startActivity(intent);
 		
 	}
 

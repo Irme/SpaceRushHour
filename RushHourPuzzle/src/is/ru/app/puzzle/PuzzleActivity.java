@@ -2,13 +2,10 @@ package is.ru.app.puzzle;
 
 import is.ru.app.db.PuzzleAdapter;
 import android.app.Activity;
-import android.content.Context;
 import android.database.Cursor;
 import android.os.Bundle;
-import android.os.Vibrator;
 import android.view.View;
 import android.widget.Button;
-import android.widget.LinearLayout;
 
 
 public class PuzzleActivity extends Activity{
@@ -18,7 +15,6 @@ public class PuzzleActivity extends Activity{
 	private int puzzleId = 1;
 	private Button m_button_prev;
 	private Button m_button_next;
-	private LinearLayout layout;
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -30,10 +26,7 @@ public class PuzzleActivity extends Activity{
 			System.out.println("first id" + puzzleId);
 		}
 		cursor.close();
-		layout = (LinearLayout) findViewById(R.id.puzzle_layout);
-		//mBoardDrawableView = new BoardDrawableView(this);
-	  //  setContentView(mBoardDrawableView);
-	    System.out.println("onCreate");
+
 	    mBoardDrawableView = (BoardDrawableView) findViewById( R.id.boardview );
 	    mBoardDrawableView.setUp(puzzleId);
 	    if ( savedInstanceState != null ) {

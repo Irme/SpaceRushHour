@@ -31,6 +31,7 @@ import android.graphics.Rect;
 import android.graphics.drawable.ShapeDrawable;
 import android.os.Bundle;
 import android.os.Vibrator;
+import android.text.style.LineHeightSpan.WithDensity;
 import android.util.AttributeSet;
 import android.util.DisplayMetrics;
 import android.view.MotionEvent;
@@ -333,7 +334,7 @@ public class BoardDrawableView extends View {
 
 
 	
-/*	private int [] maxRange(ShapeDrawable shape){
+	private int [] maxRange(ShapeDrawable shape){
 		//First entry is left/up moving range, second entry is right/down moving range.
 		if(shape != null){
 			int maxleft = widthScreen;
@@ -347,23 +348,23 @@ public class BoardDrawableView extends View {
 				if(!shape.equals(shape2)){
 
 					if(horizontal(shape) == true){
-					
-							if((shape.getBounds().top < shape2.getBounds().bottom) && (shape.getBounds().bottom > shape2.getBounds().top)){
+								
+							if((shape.getBounds().top < shape2.getBounds().bottom) && (shape.getBounds().bottom > shape2.getBounds().top) || 
+								(shape.getBounds().top < shape2.getBounds().bottom) && (shape.getBounds().bottom < shape2.getBounds().top)){
 								//It's to the right from our current brick
 								
-								maxleft = Math.min(maxleft, Math.abs((shape.getBounds().left - shape2.getBounds().right)));
-								//System.out.println("horizontal right bound detected");
-								new_max_left = Math.min(maxleft, new_max_left);
+									maxleft = Math.min(maxleft, (shape.getBounds().left - shape2.getBounds().right));
+									//System.out.println("horizontal right bound detected");
+									new_max_left = Math.min(maxleft, new_max_left);
 																
-								
-								maxright = Math.min(maxright, Math.abs(shape.getBounds().right - shape2.getBounds().left));
-								
-								new_max_right = Math.min(maxright, new_max_right);
-								
-								range [0] = new_max_left;
-								range [1] = new_max_right;
+									maxright = Math.min(maxright, shape.getBounds().right - shape2.getBounds().left);
+									
+									new_max_right = Math.min(maxright, new_max_right);
+									
+									range [0] = new_max_left;
+									range [1] = new_max_right;
 							}
-
+							
 					} else {
 						maxtop = getHeight();
 						maxbottom = getHeight();
@@ -386,7 +387,8 @@ public class BoardDrawableView extends View {
 			return range;
 		}
 		return null;
-	}*/
+	}
+	/*
 	private int [] maxRange(ShapeDrawable shape){
 		//First entry is left/up moving range, second entry is right/down moving range.
 		if(shape != null){
@@ -448,7 +450,7 @@ public class BoardDrawableView extends View {
 			return range;
 		}
 		return null;
-	}
+	}*/
 
 	private ShapeDrawable isHitBlock(int x, int y) {
 		for (ShapeDrawable shape : shapes) {

@@ -53,7 +53,7 @@
             android:layout_weight="2.0"
             android:buttonStyle="@style/button"
             android:onClick="buttonPrevious"
-            android:text="@string/play" />
+            android:text="@string/previous" />
 
         <Button
             android:id="@+id/buttonNext"
@@ -63,7 +63,7 @@
             android:layout_weight="2.0"
             android:buttonStyle="@style/button"
             android:onClick="buttonNext"
-            android:text="@string/play" />
+            android:text="@string/next" />
 
     </TableRow>
 </TableLayout>
