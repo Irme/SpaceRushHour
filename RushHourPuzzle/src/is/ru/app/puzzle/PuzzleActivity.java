@@ -67,7 +67,11 @@ public class PuzzleActivity extends Activity{
     @Override
     public void onSaveInstanceState( Bundle savedInstanceState ) {
         super.onSaveInstanceState(savedInstanceState);
+        if(mBoardDrawableView.toString() != null){
         savedInstanceState.putString( "stateSAVED",mBoardDrawableView.toString());
+        } else {
+        	System.out.println("Empty state.");
+        }
     }
     @Override
     public void onContentChanged() {

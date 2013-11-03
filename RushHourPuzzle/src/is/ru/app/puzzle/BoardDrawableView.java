@@ -40,7 +40,6 @@ public class BoardDrawableView extends View {
 
 	private List<ShapeDrawable> shapes = new ArrayList<ShapeDrawable>();
 	private PuzzleAdapter mPuzzlesAdapter = new PuzzleAdapter( this.getContext() );
-	PuzzleActivity p = new PuzzleActivity();
 
 	private int id = 0;
 	private double ratio;
@@ -80,14 +79,13 @@ public class BoardDrawableView extends View {
 		if(widthScreen > heightScreen){
 			heightScreen = (int) (heightScreen);
 			widthScreen = heightScreen;
-			width = (int)((widthScreen / 6)*ratio);
+			
 
-			ratio = 0.75;
+			
 
 		} else {
 			heightScreen = widthScreen;
 
-			ratio = 1;
 
 
 		}
@@ -137,7 +135,7 @@ public class BoardDrawableView extends View {
 
 
 	protected void init() {
-		width = (int)((widthScreen / 6)*ratio);
+		width = (int)((widthScreen / 6));
 		int height = width;
 		int x = 0, y = 0;
 		int xOffset = width;
@@ -208,8 +206,6 @@ public class BoardDrawableView extends View {
 
 	@Override
 	public boolean onTouchEvent(MotionEvent event) {
-		Vibrator v = (Vibrator) p.getSystemService(Context.VIBRATOR_SERVICE);
-		v.vibrate(500);
 		final int x = (int) event.getX();
 		final int y = (int) event.getY();
 		if(isHitBlockTrue(x, y)){
@@ -238,81 +234,67 @@ public class BoardDrawableView extends View {
 					if(bounds != null ){
 						if(bounds.getBounds() != null){
 							//width = (int)((widthScreen / 6)*ratio);
-							//width = Math.abs(bounds.getBounds().left - bounds.getBounds().right);
+							width = Math.abs(bounds.getBounds().left - bounds.getBounds().right);
 							int height = Math.abs(bounds.getBounds().bottom - bounds.getBounds().top);
 							//TODO: fix bounds
 
-							boolean moveable = true;
+							boolean onlyL = false;
+							boolean onlyR = false;
+							boolean onlyU = false;
+							boolean onlyD = false;
+						
 							if(horizontal(bounds)){
-								//System.out.println(range[0] +" , "+ range[1]);
-
-								if((x_new - width/2 > x_new - width/2- range[0]) && (x_new + width/2 <x_new + width/2 + range[1]) && moveable){
+								System.out.println(range[0] +" , "+ range[1]);
+								if(((x_new - width/2) > (x_new - width/2- range[0])) && ((x_new + width/2) <(x_new + width/2 + range[1])) && !onlyR && !onlyL && !onlyU && !onlyD){
 									bounds.setBounds(x_new - width/2,
 											old_top,
 											x_new + width/2,
 											old_bottom);
 									invalidate();
-								} if (x_new - width/2 == x_new - width/2- range[0])  {
-									moving = false;
-									moveable = false;
-									bounds.setBounds(old_left+2,
+								} if ((range[0]<=0) && (x_new > bounds.getBounds().centerX()))  {
+									bounds.setBounds(x_new - width/2,
 											old_top,
-											old_right+2,
+											x_new + width/2,
 											old_bottom);
-
-									moveable = true;
 									invalidate();
-
-
-								} else if((x_new + width/2 ==x_new + width/2 + range[1])){
-									moving =false;
-									moveable = false;
-									bounds.setBounds(old_left-2,
+									return true;
+								} else if((range[1]<=0) && (x_new < bounds.getBounds().centerX())){
+									bounds.setBounds(x_new - width/2,
 											old_top,
-											old_right-2,
+											x_new + width/2,
 											old_bottom);
-
-									moveable = true;
 									invalidate();
+									return true;
 
 								}
-
-
-
 							}else{
-
+								System.out.println(range[0] +" , "+ range[1]);
 								if((y_new - height/2 > y_new - height/2 - range[0]) &&(y_new + height/2<  y_new + height/2 + range[1])){
-
-
 									bounds.setBounds(old_left,
 											y_new - height/2, 
 											old_right, 
 											y_new+ height/2);
 									invalidate();
 								}
-								else if((y_new + height/2 ==  y_new + height/2 + range[1])){
-									moving =false;
+								else if((range[0]<=0) && (y_new > bounds.getBounds().centerY())){
 									bounds.setBounds(old_left,
-											old_top-2, 
-											old_right, 
-											old_bottom-2);
-									invalidate();
-
-
-
-
-								} else if((y_new - height/2 > y_new - height/2 - range[0])) {
-									moving =false;
-									bounds.setBounds(old_left,
-											y_new + height/2, 
+											y_new - height/2, 
 											old_right, 
 											y_new+ height/2);
 									invalidate();
+									return true;
 
-
+								} else if((range[1]<=0) && (y_new < bounds.getBounds().centerY())) {
+									bounds.setBounds(old_left,
+											y_new - height/2, 
+											old_right, 
+											y_new+ height/2);
+									invalidate();
+									return true;
 								}
 
 							}
+
 						} 
 
 					}
@@ -341,9 +323,9 @@ public class BoardDrawableView extends View {
 
 					if(horizontal(shape) == true){
 						maxleft = shape.getBounds().left;
-						maxright = widthScreen = shape.getBounds().right;
-						if(((shape.getBounds().top < shape2.getBounds().top) && (shape2.getBounds().top < shape.getBounds().bottom))|| 
-								((shape.getBounds().top < shape2.getBounds().bottom) && (shape2.getBounds().bottom <shape.getBounds().bottom))||
+						maxright = widthScreen - shape.getBounds().right;
+						if(((shape.getBounds().top <= shape2.getBounds().top) && (shape2.getBounds().top < shape.getBounds().bottom))|| 
+								((shape.getBounds().top < shape2.getBounds().bottom) && (shape2.getBounds().bottom <=shape.getBounds().bottom))||
 								(((shape2.getBounds().top <= shape.getBounds().top) && (shape.getBounds().bottom <= shape2.getBounds().bottom)))){
 							if((shape2.getBounds().left - shape.getBounds().right) < (shape.getBounds().left - shape2.getBounds().right)){
 								//It's to the right from our current brick
@@ -360,26 +342,26 @@ public class BoardDrawableView extends View {
 
 					} else {
 						maxleft = shape.getBounds().top;
-						maxright = widthScreen = shape.getBounds().bottom;
-						if(((shape.getBounds().left < shape2.getBounds().left) && (shape2.getBounds().left <shape.getBounds().right))||
-								((shape.getBounds().left < shape2.getBounds().right) && (shape2.getBounds().right <shape.getBounds().right))
+						maxright = widthScreen - shape.getBounds().bottom;
+						if(((shape.getBounds().left <= shape2.getBounds().left) && (shape2.getBounds().left <shape.getBounds().right))||
+								((shape.getBounds().left < shape2.getBounds().right) && (shape2.getBounds().right <=shape.getBounds().right))
 								||((shape2.getBounds().left <= shape.getBounds().left)&&(shape.getBounds().right <= shape2.getBounds().right))){
 							if((shape2.getBounds().bottom -shape.getBounds().top)<(shape.getBounds().bottom -shape2.getBounds().top)){
 								//It's above from our current brick
-								maxright = Math.min(maxright, Math.abs((shape2.getBounds().bottom-shape.getBounds().top)));
+								maxleft = Math.min(maxleft, Math.abs((shape2.getBounds().bottom-shape.getBounds().top)));
 
 							} else{
 
 								// It's below
-								maxleft = Math.min(maxleft, Math.abs((shape.getBounds().bottom-shape2.getBounds().top)));
+								maxright = Math.min(maxright, Math.abs((shape.getBounds().bottom-shape2.getBounds().top)));
 
 							}
 
 						}
 
 					}
-					range [0] = maxright;
-					range [1] = maxleft;
+					range [0] = maxleft;
+					range [1] = maxright;
 				}
 
 			}
@@ -471,32 +453,26 @@ public class BoardDrawableView extends View {
 
 
 	}
-	@Override
-	protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
-		super.onMeasure(widthMeasureSpec, heightMeasureSpec);
-		int size = Math.min(getMeasuredWidth(), getMeasuredHeight());
-		widthScreen = size;
-		heightScreen = size;
-		setMeasuredDimension(size, size);
-	}
 
-	protected void onSizeChanged(int xNew, int yNew, int xOld, int yOld) {
-		//		 int size = Math.min(getMeasuredWidth(), getMeasuredHeight());
-		//	        widthScreen = size;
-		//	        heightScreen = size;
-		//	        if(widthScreen > heightScreen){
-		//				heightScreen = (int) (heightScreen);
-		//				widthScreen = heightScreen;
-		//				width = (int)((widthScreen / 6)*ratio);
-		//				ratio = 0.75;
-		//			} else {
-		//				heightScreen = widthScreen;
-		//				ratio = 1;
-		//			}
-		//	        
-		//	    }
-		for (ShapeDrawable shape : shapes) {
-			shape.setBounds((int)(shape.getBounds().left*0.9), (int)(shape.getBounds().top*0.9), (int)(shape.getBounds().right*0.9), (int)(shape.getBounds().bottom*0.9));
-		}
-	}
+
+//	protected void onSizeChanged(int xNew, int yNew, int xOld, int yOld) {
+//				 int size = Math.min(getMeasuredWidth(), getMeasuredHeight());
+//			        widthScreen = size;
+//			        heightScreen = size;
+//			        if(widthScreen > heightScreen){
+//						heightScreen = (int) (heightScreen);
+//						widthScreen = heightScreen;
+//						width = (int)((widthScreen / 6)*ratio);
+//						ratio = 0.95;
+//					} else {
+//						heightScreen = widthScreen;
+//						ratio = 1;
+//					}
+//			        
+////					for (ShapeDrawable shape : shapes) {
+////						shape.setBounds((int)(shape.getBounds().left*0.95), (int)(shape.getBounds().top*0.95), (int)(shape.getBounds().right*0.95), (int)(shape.getBounds().bottom*0.95));
+////					}
+//			    }
+
+	
 }
