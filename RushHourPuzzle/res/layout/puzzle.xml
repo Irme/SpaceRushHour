@@ -1,28 +1,68 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical" >
+    android:orientation="vertical"
+    tools:context=".PuzzleActivity" >
 
-<shape android:shape="rectangle" >
+  <!--   <shape android:shape="rectangle" >
 
-    <gradient
-        android:startColor="#00CCFF"
-        android:centerColor="#0000CC"
-        android:endColor="#00CCFF"
-        android:angle="90"/>
+        <gradient
+            android:angle="90"
+            android:centerColor="#0000CC"
+            android:endColor="#00CCFF"
+            android:startColor="#00CCFF" />
 
-    <padding
+        <padding
+            android:layout_height="wrap_content"
+            android:bottom="7dp"
+            android:left="7dp"
+            android:right="7dp"
+            android:top="7dp" />
+
+        <stroke
+            android:width="2dip"
+            android:color="#FFFFFF" />
+
+        <corners android:radius="8dp" />
+    </shape> -->
+
+    <is.ru.app.puzzle.BoardDrawableView
+            android:id="@+id/boardview"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:background="#ffffff"
+            />
+
+<TableLayout
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content" >
+
+    <TableRow
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:bottom="7dp"
-        android:left="7dp"
-        android:right="7dp"
-        android:top="7dp" />
+        android:padding="5dip" >
 
-    <stroke
-        android:width="2dip"
-        android:color="#FFFFFF" />
-    <corners android:radius= "8dp" />
-</shape>
+        <Button
+            android:id="@+id/buttonPrevious"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:buttonStyle="@style/button"
+            android:onClick="buttonPlay"
+            android:text="@string/play" />
+<Space android:layout_width="5dip"/>
 
+        <Button
+            android:id="@+id/buttonNext"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:layout_gravity="center"
+            android:buttonStyle="@style/button"
+            android:onClick="buttonPlay"
+            android:text="@string/play" />
+
+    </TableRow>
+</TableLayout>
 </LinearLayout>

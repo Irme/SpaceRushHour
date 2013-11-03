@@ -28,8 +28,8 @@ public class MainActivity extends Activity {
 		Cursor cursor = mPuzzlesAdapter.queryPuzzles();
 		if(cursor.getCount() == 0){
 			setUpData(cursor);
-		}else{
-
+		} else {
+			//checkData();
 		}
 		cursor.close();
 	}
@@ -49,10 +49,26 @@ public class MainActivity extends Activity {
 	 * Sets up data for the first time
 	 */
 	public void setUpData(Cursor cursor){
+		mPuzzlesAdapter.deletePuzzles();
 		List<Puzzle> pList = readInPuzzle(puzzleFile);
 		for(Puzzle p : pList){
 			mPuzzlesAdapter.insertPuzzle( Integer.parseInt(p.id), p.setup, Integer.parseInt(p.level), false, false);
 		}
+	}
+	
+	public void checkData(){
+		Cursor cursor2 = mPuzzlesAdapter.queryPuzzles();
+		while(cursor2.moveToNext())
+		  {
+			int s_id = cursor2.getInt(1);
+			String s_setup = cursor2.getString(2);
+			if(s_setup.length() < 1){
+				mPuzzlesAdapter.deletePuzzles();
+				
+			}
+		  }
+		setUpData(cursor2);
+		cursor2.close();
 	}
 	
 	 public List<Puzzle> readInPuzzle(String puzzleFile){
@@ -91,6 +107,7 @@ public class MainActivity extends Activity {
 	protected void onResume() {
 		// TODO Auto-generated method stub
 		super.onResume();
+		checkData();
 	}
 
 	@Override
