@@ -39,7 +39,8 @@ public class BoardDrawableView extends View {
 
 	private List<ShapeDrawable> shapes = new ArrayList<ShapeDrawable>();
 	private int id = 0;
-	private int ratio;
+	private double ratio;
+	private int width;
 
 	// Blue colors
 	private Integer[] m_colors = { 0xffCC0000, 0xff0099CC, 0xff3399CC,
@@ -73,10 +74,17 @@ public class BoardDrawableView extends View {
 		widthScreen = metrics.widthPixels;
 		heightScreen = metrics.heightPixels;
 		if(widthScreen > heightScreen){
+			heightScreen = (int) (heightScreen);
 			widthScreen = heightScreen;
+			width = (int)((widthScreen / 6)*ratio);
+			
+			ratio = 0.75;
 			
 		} else {
 			heightScreen = widthScreen;
+			
+			ratio = 1;
+			
 
 		}
 		this.id = id;
@@ -118,7 +126,7 @@ public class BoardDrawableView extends View {
 	}
 
 	protected void init() {
-		int width = widthScreen / 6;
+		width = (int)((widthScreen / 6)*ratio);
 		int height = width;
 		int x = 0, y = 0;
 		int xOffset = width;
@@ -212,7 +220,8 @@ public class BoardDrawableView extends View {
 					final int y_new = (int)event.getY();
 					if(bounds != null ){
 						if(bounds.getBounds() != null){
-							int width = Math.abs(bounds.getBounds().left - bounds.getBounds().right);
+							width = (int)((widthScreen / 6)*ratio);
+							//width = Math.abs(bounds.getBounds().left - bounds.getBounds().right);
 							int height = Math.abs(bounds.getBounds().bottom - bounds.getBounds().top);
 							//TODO: fix bounds
 
@@ -303,26 +312,7 @@ public class BoardDrawableView extends View {
 		}
 	}      
 
-	private boolean collision(ShapeDrawable shape1){
-		Rect rect1 = shape1.getBounds();
-		for (ShapeDrawable shape2 : shapes){
-			if(!shape1.equals(shape2)){
-				Rect rect2 = shape2.getBounds();
-				System.out.println(rect2.top + " " + rect1.bottom);
-				//				if(rect1.contains(rect2.left, rect2.top) ||
-				//						rect1.contains(rect2.right, rect2.top)||
-				//						rect1.contains(rect2.right, rect2.bottom)||
-				//						rect1.contains(rect2.left, rect2.bottom)){
-				//					return true;
-				//				}
-
-				return Rect.intersects(rect2, rect1);
-			}
-		}
-		return false;
-
-	}
-
+	
 	private int [] maxRange(ShapeDrawable shape){
 		//First entry is left/up moving range, second entry is right/down moving range.
 		if(shape != null){
@@ -473,6 +463,24 @@ public class BoardDrawableView extends View {
 	        setMeasuredDimension(size, size);
 	    }
 	
+	 protected void onSizeChanged(int xNew, int yNew, int xOld, int yOld) {
+		 int size = Math.min(getMeasuredWidth(), getMeasuredHeight());
+	        widthScreen = size;
+	        heightScreen = size;
+	        if(widthScreen > heightScreen){
+				heightScreen = (int) (heightScreen);
+				widthScreen = heightScreen;
+				width = (int)((widthScreen / 6)*ratio);
+				
+				ratio = 0.75;
+				
+			} else {
+				heightScreen = widthScreen;
+				
+				ratio = 1;
+				
 
-
+			}
+	        
+	    }
 }
