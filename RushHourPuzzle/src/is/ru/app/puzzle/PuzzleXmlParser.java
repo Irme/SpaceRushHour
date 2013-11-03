@@ -65,7 +65,7 @@ public class PuzzleXmlParser {
 	        	setup = readTag(parser, name);
 	        } 
 	    }
-	    return new Puzzle(id, level, length, setup);
+	    return new Puzzle(id, level, length, setup, false, false);
 	}
 	
 	// Processes title tags in the feed.

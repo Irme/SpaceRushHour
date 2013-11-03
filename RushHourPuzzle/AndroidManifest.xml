@@ -5,7 +5,7 @@
     android:versionName="1.0" >
 
     <uses-sdk
-        android:minSdkVersion="8"
+        android:minSdkVersion="14"
         android:targetSdkVersion="18" />
 
     <uses-feature
@@ -16,10 +16,11 @@
         android:allowBackup="true"
         android:icon="@drawable/ic_launcher"
         android:label="@string/app_name"
-        android:theme="@style/AppTheme" >
+        android:theme="@style/YourApplicationTheme" >
         <activity
             android:name="is.ru.app.puzzle.MainActivity"
-            android:label="@string/app_name" >
+            android:label="@string/app_name" 
+             >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 

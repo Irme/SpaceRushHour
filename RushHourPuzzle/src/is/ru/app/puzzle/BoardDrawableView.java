@@ -1,33 +1,32 @@
 package is.ru.app.puzzle;
 
+import is.ru.app.db.PuzzleAdapter;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashMap;
-import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.TreeMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.xmlpull.v1.XmlPullParserException;
 
 import android.content.Context;
+import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapShader;
 import android.graphics.Canvas;
-import android.graphics.LinearGradient;
-import android.graphics.Paint.Style;
+import android.graphics.RadialGradient;
 import android.graphics.Shader;
 import android.graphics.SweepGradient;
 
 import android.graphics.Rect;
 import android.graphics.drawable.ShapeDrawable;
-import android.util.AttributeSet;
+import android.os.Bundle;
 import android.util.DisplayMetrics;
 import android.view.MotionEvent;
 import android.view.View;
@@ -36,6 +35,8 @@ import android.widget.Toast;
 public class BoardDrawableView extends View {
 
 	private List<ShapeDrawable> shapes = new ArrayList<ShapeDrawable>();
+	private PuzzleAdapter mPuzzlesAdapter = new PuzzleAdapter( this.getContext() );
+	
 	private int id = 0;
 
 	// Blue colors
@@ -69,30 +70,35 @@ public class BoardDrawableView extends View {
 		widthScreen = metrics.widthPixels;
 		heightScreen = metrics.heightPixels;
 		this.id = id;
-		readInPuzzle(puzzleFile);
+		//Read puzzle from db
+		readInPuzzle(id);
 		init();
 	}
-
-	public void readInPuzzle(String puzzleFile){
-		PuzzleXmlParser xmlParser = new PuzzleXmlParser();
-		try {
-			InputStream in = getContext().getAssets().open(puzzleFile);
-			xmlParser.parse(in);
-			createBoxes(xmlParser, id);
-		} catch (IOException e) {
-			e.printStackTrace();
-		} catch (XmlPullParserException xmlEx) {
-			xmlEx.printStackTrace();
-		}
+	
+	public void readInPuzzle(int id){
+		Cursor cursor = mPuzzlesAdapter.queryPuzzle(id);
+		System.out.println("id " + id);
+		while(cursor.moveToNext())
+		  {
+			int s_id = cursor.getInt(1);
+			String s_setup = cursor.getString(2);
+			String s_level = String.valueOf(cursor.getInt(3));
+			String s_length = String.valueOf(cursor.getInt(4));
+			boolean s_solved = cursor.getInt(4) == 0 ? false : true;
+			Puzzle puzzle = new Puzzle(String.valueOf(id), s_setup, s_level, s_length, s_solved, true);
+		//	mPuzzlesAdapter.updatePuzzleRestPlaying();
+			mPuzzlesAdapter.updatePuzzle(s_id, true);
+			createBoxes(puzzle);
+		  }
+		cursor.close();
 	}
+
 
 	// <setup>(H 1 2 2), (V 0 1 3), (H 0 0 2), (V 3 1 3), (H 2 5 3), (V 0 4 2),
 	// (H 4 4 2), (V 5 0 3)</setup>
-	public void createBoxes(PuzzleXmlParser xmlParser, int id) {
-		List<Puzzle> puzzles = xmlParser.getPuzzles();
+	public void createBoxes(Puzzle puzzle) {
 		Pattern pattern = Pattern.compile("\\d+");
-		Puzzle p = puzzles.get(id);
-		String setup = p.setup;
+		String setup = puzzle.setup;
 		LinkedList<String> items = new LinkedList<String>(Arrays.asList(setup.split(",")));
 		
 		for (String s : items) {
@@ -105,6 +111,7 @@ public class BoardDrawableView extends View {
 			boxes.put(s.trim(), box);
 		}
 	}
+	
 
 	protected void init() {
 		int width = widthScreen / 6;
@@ -135,7 +142,8 @@ public class BoardDrawableView extends View {
 				shapeD.setBounds(shape);
 			}
 			//shapeD.getPaint().setStyle(Style.STROKE);
-		//	shapeD.getPaint().setShader(makeLinear());
+			//shapeD.getPaint().setShader(makeLinear(shape.centerX(), shape.centerY()));
+		
 			shapeD.getPaint().setColor(m_colors[count++]);
 			// shapeD.setPadding(20, 20, 20, 20);
 			shapes.add(shapeD);
@@ -148,10 +156,9 @@ public class BoardDrawableView extends View {
              null);
      }
 
-     private static Shader makeLinear() {
-         return new LinearGradient(0, 0, 50, 50,
-                           new int[] { 0xFFFF0000, 0xFF00FF00, 0xFF0000FF },
-                           null, Shader.TileMode.CLAMP);
+     private static Shader makeLinear(int x, int y) {
+         return new RadialGradient (x, y, 50, new int[] { 0xFFFF0000, 0xFF00FF00, 0xFF0000FF },
+                           null, Shader.TileMode.MIRROR);
      }
 
      private static Shader makeTiling() {
@@ -169,6 +176,11 @@ public class BoardDrawableView extends View {
 			//shape.getBounds().inset( (int)(shape.getBounds().width() * 0.01), (int)(shape.getBounds().height() * 0.01) );
 			shape.draw(canvas);
 		}
+		/*GradientDrawable g = new GradientDrawable(Orientation.LEFT_RIGHT, new int[] { Color.GREEN, Color.RED, Color.BLUE });
+		g.setGradientType(GradientDrawable.RADIAL_GRADIENT);
+		g.setGradientRadius(140.0f);
+		g.setGradientCenter(0.0f, 0.45f);
+		g.draw(canvas);*/
 	}
 
 	@Override
