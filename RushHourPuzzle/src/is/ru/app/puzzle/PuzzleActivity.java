@@ -19,6 +19,7 @@ public class PuzzleActivity extends Activity{
 	private Button m_button_prev;
 	private Button m_button_next;
 	private LinearLayout layout;
+	private int rotations;
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -39,7 +40,9 @@ public class PuzzleActivity extends Activity{
 	    if ( savedInstanceState != null ) {
             String state = savedInstanceState.getString( "stateSAVED" );
             mBoardDrawableView.resetShapes(state);
-            puzzleId = savedInstanceState.getInt("puzzleId");
+            puzzleId = savedInstanceState.getInt("puzzleId");	
+            rotations = savedInstanceState.getInt("rotations") +1;
+            
         }
 	    
 	    m_button_prev = (Button) findViewById( R.id.buttonPrevious );
@@ -105,6 +108,7 @@ public class PuzzleActivity extends Activity{
         if(mBoardDrawableView.toString() != null){
         savedInstanceState.putString( "stateSAVED",mBoardDrawableView.toString());
         savedInstanceState.putString( "puzzleId", String.valueOf(puzzleId));
+        savedInstanceState.putString("rotations", String.valueOf(rotations));
         } else {
         	System.out.println("Empty state.");
         }

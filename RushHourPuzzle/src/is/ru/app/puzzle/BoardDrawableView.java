@@ -43,6 +43,8 @@ public class BoardDrawableView extends View {
 	private PuzzleAdapter mPuzzlesAdapter = new PuzzleAdapter( this.getContext() );
 
 	private int width;
+	private boolean rotated = false;
+	private int rotations = 0;
 
 
 	// Blue colors
@@ -64,7 +66,7 @@ public class BoardDrawableView extends View {
 	private int startX = 0, startY = 0, endX = 0, endY = 0;
 	private int deltaX = 0, deltaY = 0;
 	private Vibrator v;
-	private double ratio;
+	private double ratio = 0.85;
 
 	private static final String puzzleFile = "challenge_classic40.xml";
 
@@ -73,34 +75,33 @@ public class BoardDrawableView extends View {
 	Map<String, LinkedList<Integer>> boxes = new LinkedHashMap<String, LinkedList<Integer>>();
 
 	public BoardDrawableView(Context context, AttributeSet attrs) {
-        super(context, attrs);
+		super(context, attrs);
 		DisplayMetrics metrics = context.getResources().getDisplayMetrics();
 		v = (Vibrator) context.getApplicationContext().getSystemService(Context.VIBRATOR_SERVICE);
 		//OptionActivity opt = new OptionActivity();
-		
+
 		widthScreen = metrics.widthPixels;
 		heightScreen = metrics.heightPixels;
 		if(widthScreen > heightScreen){
 			heightScreen = (int) (heightScreen);
 			widthScreen = heightScreen;
-			ratio = 0.9;
-			
-			
-			
-			
+			rotated = true;
+
+
+
 		} else {
 			heightScreen = widthScreen;
-			ratio = 1;
+			rotated = false;
 
 
 
 		}
-	//	this.id = id;
+		//	this.id = id;
 		//Read puzzle from db
-	//	readInPuzzle(id);
-	//	init();
+		//	readInPuzzle(id);
+		//	init();
 	}
-	
+
 	public void setUp(int id){
 		readInPuzzle(id);
 		init();
@@ -215,14 +216,14 @@ public class BoardDrawableView extends View {
 		g.draw(canvas);*/
 	}
 
-    @Override
-   public boolean onTouchEvent(MotionEvent event) {
-		
+	@Override
+	public boolean onTouchEvent(MotionEvent event) {
+
 		// Get instance of Vibrator from current Context
-		
+
 
 		// Vibrate for 300 milliseconds
-		
+
 		final int x = (int) event.getX();
 		final int y = (int) event.getY();
 		if(isHitBlockTrue(x, y)){
@@ -230,8 +231,8 @@ public class BoardDrawableView extends View {
 			int range[] = maxRange(bounds);
 			switch (event.getAction()) {
 			case MotionEvent.ACTION_DOWN:
-//				if()
-//				v.vibrate(50);
+				//				if()
+				//				v.vibrate(50);
 				if (bounds != null) {
 					//	Rect rect = new Rect();
 					//	rect.set(bounds.getBounds().left, bounds.getBounds().top,
@@ -253,7 +254,7 @@ public class BoardDrawableView extends View {
 					if(bounds != null ){
 						if(bounds.getBounds() != null){
 							//width = (int)((widthScreen / 6)*ratio);
-							width = Math.abs(bounds.getBounds().left - bounds.getBounds().right);
+							//width = Math.abs(bounds.getBounds().left - bounds.getBounds().right);
 							int height = Math.abs(bounds.getBounds().bottom - bounds.getBounds().top);
 							//TODO: fix bounds
 
@@ -261,7 +262,7 @@ public class BoardDrawableView extends View {
 							boolean onlyR = false;
 							boolean onlyU = false;
 							boolean onlyD = false;
-						
+
 							if(horizontal(bounds)){
 								System.out.println(range[0] +" , "+ range[1]);
 								if(((x_new - width/2) > (x_new - width/2- range[0])) && ((x_new + width/2) <(x_new + width/2 + range[1])) && !onlyR && !onlyL && !onlyU && !onlyD){
@@ -329,11 +330,11 @@ public class BoardDrawableView extends View {
 			return false;
 		}
 	}      
-           
 
 
-	
-/*	private int [] maxRange(ShapeDrawable shape){
+
+
+	/*	private int [] maxRange(ShapeDrawable shape){
 		//First entry is left/up moving range, second entry is right/down moving range.
 		if(shape != null){
 			int maxleft = widthScreen;
@@ -347,19 +348,19 @@ public class BoardDrawableView extends View {
 				if(!shape.equals(shape2)){
 
 					if(horizontal(shape) == true){
-					
+
 							if((shape.getBounds().top < shape2.getBounds().bottom) && (shape.getBounds().bottom > shape2.getBounds().top)){
 								//It's to the right from our current brick
-								
+
 								maxleft = Math.min(maxleft, Math.abs((shape.getBounds().left - shape2.getBounds().right)));
 								//System.out.println("horizontal right bound detected");
 								new_max_left = Math.min(maxleft, new_max_left);
-																
-								
+
+
 								maxright = Math.min(maxright, Math.abs(shape.getBounds().right - shape2.getBounds().left));
-								
+
 								new_max_right = Math.min(maxright, new_max_right);
-								
+
 								range [0] = new_max_left;
 								range [1] = new_max_right;
 							}
@@ -367,19 +368,19 @@ public class BoardDrawableView extends View {
 					} else {
 						maxtop = getHeight();
 						maxbottom = getHeight();
-					
+
 							if((shape.getBounds().top < shape2.getBounds().bottom) && (shape.getBounds().bottom > shape2.getBounds().top)){
 								//It's to the right from our current brick
 								maxbottom = Math.min(maxbottom, Math.abs((shape2.getBounds().top - shape2.getBounds().top)));
 								//System.out.println("horizontal right bound detected");
-							
+
 								maxtop = Math.min(maxtop, Math.abs((shape2.getBounds().bottom - shape.getBounds().top)));
 								range [0] = maxtop;
 								range [1] = maxbottom;
 							}
 
 					}
-	
+
 				}
 
 			}
@@ -402,9 +403,9 @@ public class BoardDrawableView extends View {
 						if(((shape.getBounds().top <= shape2.getBounds().top) && (shape2.getBounds().top < shape.getBounds().bottom))|| 
 								((shape.getBounds().top < shape2.getBounds().bottom) && (shape2.getBounds().bottom <=shape.getBounds().bottom))||
 								(((shape2.getBounds().top <= shape.getBounds().top) && (shape.getBounds().bottom <= shape2.getBounds().bottom)))){
-							
-							
-							
+
+
+
 							if((shape2.getBounds().left - shape.getBounds().right) < (shape.getBounds().left - shape2.getBounds().right)){
 								//It's to the right from our current brick
 								maxleft = Math.min(maxleft,Math.abs((shape.getBounds().left-shape2.getBounds().right)));
@@ -424,8 +425,8 @@ public class BoardDrawableView extends View {
 						if(((shape.getBounds().left <= shape2.getBounds().left) && (shape2.getBounds().left <shape.getBounds().right))||
 								((shape.getBounds().left < shape2.getBounds().right) && (shape2.getBounds().right <=shape.getBounds().right))
 								||((shape2.getBounds().left <= shape.getBounds().left)&&(shape.getBounds().right <= shape2.getBounds().right))){
-							
-							
+
+
 							if((shape2.getBounds().bottom -shape.getBounds().top)<(shape.getBounds().bottom -shape2.getBounds().top)){
 								//It's above from our current brick
 								maxleft = Math.min(maxleft, Math.abs((shape2.getBounds().bottom-shape.getBounds().top)));
@@ -497,7 +498,7 @@ public class BoardDrawableView extends View {
 			s.append(shape.getBounds().bottom);
 			s.append(",");
 		}
-
+		
 		return s.toString();
 
 	}
@@ -509,24 +510,24 @@ public class BoardDrawableView extends View {
 		shapes.clear();
 
 		int count = 0;
-		for(int j = 0; j < temp1.length; j++){
-			System.out.println(temp1[j]);
-			String[] temp2 = temp1[j].split(":");
-			for (int i = 0; i < temp2.length; i = i+4) {
-				ShapeDrawable tempshape = new ShapeDrawable();
-				tempshape.setBounds(Integer.parseInt(temp2[i]), Integer.parseInt(temp2[i+1]), Integer.parseInt(temp2[i+2]),Integer.parseInt(temp2[i+3]));
-				System.out.println("Left : " + temp2[i]);
-				System.out.println("top : " + temp2[i+1]);
-				System.out.println("right : " + temp2[i+2]);
-				System.out.println("Bottom : " + temp2[i+3]);
-				tempshape.getPaint().setColor(m_colors[count++]);
-				System.out.println(i);
-				System.out.println(count);
-				shapes.add(tempshape);
-				//temp2 = null;
+			for(int j = 0; j < temp1.length; j++){
+				//System.out.println(temp1[j]);
+				String[] temp2 = temp1[j].split(":");
+				for (int i = 0; i < temp2.length; i = i+4) {
+					ShapeDrawable tempshape = new ShapeDrawable();
+					tempshape.setBounds(Integer.parseInt(temp2[i]), Integer.parseInt(temp2[i+1]), Integer.parseInt(temp2[i+2]),Integer.parseInt(temp2[i+3]));
+					//System.out.println("Left : " + temp2[i]);
+					//System.out.println("top : " + temp2[i+1]);
+					//System.out.println("right : " + temp2[i+2]);
+					//System.out.println("Bottom : " + temp2[i+3]);
+					tempshape.getPaint().setColor(m_colors[count++]);
+					//System.out.println(i);
+					//System.out.println(count);
+					shapes.add(tempshape);
+					//temp2 = null;
 
+				}
 			}
-		}
 
 
 		invalidate();
@@ -536,10 +537,25 @@ public class BoardDrawableView extends View {
 
 
 	protected void onSizeChanged(int xNew, int yNew, int xOld, int yOld) {
-					for (ShapeDrawable shape : shapes) {
-						shape.setBounds((int)(shape.getBounds().left*ratio), (int)(shape.getBounds().top*ratio), (int)(shape.getBounds().right*ratio), (int)(shape.getBounds().bottom*ratio));
-					}
-			    }
+		System.out.println(rotations);
+		if((rotations%2 == 1)){
 
-	
+			for (ShapeDrawable shape : shapes) {
+				shape.setBounds((int)(shape.getBounds().left*ratio), (int)(shape.getBounds().top*ratio), (int)(shape.getBounds().right*ratio), (int)(shape.getBounds().bottom*ratio));
+			} 
+
+		} else if ((rotations%2 == 0) && rotations > 0){
+			for (ShapeDrawable shape : shapes) {
+				shape.setBounds((int)(shape.getBounds().left*(1/ratio)), (int)(shape.getBounds().top*(1/ratio)), (int)(shape.getBounds().right*(1/ratio)), (int)(shape.getBounds().bottom*(1/ratio)));
+			}
+		}
+
+
+	}
+
+
+
+
+
+
 }
