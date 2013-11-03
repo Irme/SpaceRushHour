@@ -29,7 +29,7 @@ public class PuzzleActivity extends Activity{
             mBoardDrawableView.resetShapes(state);
         }
 	    
-       
+	   
 	}
 	
 	@Override

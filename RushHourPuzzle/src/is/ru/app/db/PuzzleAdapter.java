@@ -101,4 +101,10 @@ public class PuzzleAdapter {
 	                                  cols, cols[5] + "=" + (playing ? 1 : 0) , null, null, null, null );
 	        return cursor;
 	    }
+	    
+	    public int deletePuzzles( ) {
+	    	openToWrite();
+	        int result = db.delete(DBHelper.TablePuzzles, null, null);
+	        return result;
+	    }
 }
