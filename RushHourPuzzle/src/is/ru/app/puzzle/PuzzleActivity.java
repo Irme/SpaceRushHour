@@ -23,7 +23,15 @@ public class PuzzleActivity extends Activity{
 		cursor.close();
 		mBoardDrawableView = new BoardDrawableView(this, puzzleId);
 	    setContentView(mBoardDrawableView);
+	    
+	    if ( savedInstanceState != null ) {
+            String state = savedInstanceState.getString( "stateSAVED" );
+            mBoardDrawableView.resetShapes(state);
+        }
+	    
+       
 	}
+	
 	@Override
 	protected void onPause() {
 		// TODO Auto-generated method stub
@@ -45,5 +53,16 @@ public class PuzzleActivity extends Activity{
     @Override
     protected void onRestart() {
         super.onRestart();
+    }
+    
+    @Override
+    public void onSaveInstanceState( Bundle savedInstanceState ) {
+        super.onSaveInstanceState(savedInstanceState);
+        savedInstanceState.putString( "stateSAVED",mBoardDrawableView.toString());
+    }
+    @Override
+    public void onContentChanged() {
+    	// TODO Auto-generated method stub
+    	//super.onContentChanged();
     }
 	}
