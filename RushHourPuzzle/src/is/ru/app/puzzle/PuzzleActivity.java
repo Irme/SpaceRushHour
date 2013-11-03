@@ -2,9 +2,10 @@ package is.ru.app.puzzle;
 
 import is.ru.app.db.PuzzleAdapter;
 import android.app.Activity;
+import android.content.Context;
 import android.database.Cursor;
 import android.os.Bundle;
-import android.view.View;
+import android.os.Vibrator;
 import android.widget.Button;
 import android.widget.LinearLayout;
 
@@ -97,12 +98,15 @@ public class PuzzleActivity extends Activity{
     @Override
     public void onSaveInstanceState( Bundle savedInstanceState ) {
         super.onSaveInstanceState(savedInstanceState);
+        if(mBoardDrawableView == null){
+        	System.out.println("Empty view");
+        }
+        if(mBoardDrawableView.toString() != null){
         savedInstanceState.putString( "stateSAVED",mBoardDrawableView.toString());
         savedInstanceState.putString( "puzzleId", String.valueOf(puzzleId));
+        } else {
+        	System.out.println("Empty state.");
+        }
     }
-    @Override
-    public void onContentChanged() {
-    	// TODO Auto-generated method stub
-    	//super.onContentChanged();
-    }
+   
 	}
