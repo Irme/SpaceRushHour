@@ -53,7 +53,7 @@ public class ListPuzzlesActivity extends ListActivity{
 	
 	 @Override
 	 public void onListItemClick(ListView l, View v, int position, long id) {
-		 String playing = R.string.playing_text + " " + (position + 1);
+		 String playing = "Playing Puzzle nr." + " " + (position + 1);
 		 Toast.makeText(getApplicationContext(), playing, Toast.LENGTH_LONG).show();
 		 mPuzzlesAdapter.updatePuzzleRestPlaying();
 		 mPuzzlesAdapter.updatePuzzle((int)(position + 1), true);

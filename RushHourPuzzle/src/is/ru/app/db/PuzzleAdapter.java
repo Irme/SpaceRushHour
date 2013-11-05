@@ -109,7 +109,7 @@ public class PuzzleAdapter {
 	        openToRead();
 	        String[] cols = DBHelper.TablePuzzlesCols;
 	        Cursor cursor = db.query( DBHelper.TablePuzzles,
-	                                  cols, cols[5] + "=" + (playing ? 1 : 0) , null, null, null, null );
+	                                  cols, cols[5] + "=" + "1" , null, null, null, null );
 	        return cursor;
 	    }
 	    

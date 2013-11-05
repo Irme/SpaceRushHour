@@ -22,13 +22,17 @@ import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapShader;
 import android.graphics.Canvas;
+import android.graphics.Color;
 import android.graphics.LinearGradient;
 import android.graphics.RadialGradient;
 import android.graphics.Shader;
 import android.graphics.SweepGradient;
 
 import android.graphics.Rect;
+import android.graphics.drawable.Drawable;
+import android.graphics.drawable.PaintDrawable;
 import android.graphics.drawable.ShapeDrawable;
+import android.graphics.drawable.shapes.RectShape;
 import android.os.Bundle;
 import android.os.Vibrator;
 import android.text.style.LineHeightSpan.WithDensity;
@@ -101,12 +105,13 @@ public class BoardDrawableView extends View {
 		while(cursor.moveToNext())
 		{
 			int s_id = cursor.getInt(1);
+			System.out.println("s_id " + s_id);
 			String s_setup = cursor.getString(2);
 			String s_level = String.valueOf(cursor.getInt(3));
 			String s_length = String.valueOf(cursor.getInt(4));
 			boolean s_solved = cursor.getInt(4) == 0 ? false : true;
 			Puzzle puzzle = new Puzzle(String.valueOf(id), s_setup, s_level, s_length, s_solved, true);
-			//	mPuzzlesAdapter.updatePuzzleRestPlaying();
+		//	mPuzzlesAdapter.updatePuzzleRestPlaying();
 			mPuzzlesAdapter.updatePuzzle(s_id, true);
 			createBoxes(puzzle);
 		}
@@ -159,15 +164,45 @@ public class BoardDrawableView extends View {
 			if (key.startsWith("(H")) {
 				shape.set(x, y, x + span, y + height);
 				shapeD.setBounds(shape);
+			///	shapeD.getPaint().setShader(makeLinear(m_colors[count++], height));
 			} else if (key.startsWith("(V")) {
 				shape.set(x, y, x + width, y + span);
 				shapeD.setBounds(shape);
+			//	shapeD.getPaint().setShader(makeLinear(m_colors[count++], width));
 			}
 	
 			shapeD.getPaint().setColor(m_colors[count++]);
+			
 			shapes.add(shapeD);
 		}
+		
+	
+	/*	ShapeDrawable.ShaderFactory sf = new ShapeDrawable.ShaderFactory() {
+		    @Override
+		    public Shader resize(int width, int height) {
+		        LinearGradient lg = new LinearGradient(0, 0, 0, height,
+		            new int[] { 
+		                Color.GREEN, 
+		                Color.WHITE, 
+		                Color.LTGRAY, 
+		                Color.DKGRAY }, //substitute the correct colors for these
+		            new float[] { 0, 0.45f, 0.55f, 1 },
+		            Shader.TileMode.REPEAT);
+		         return lg;
+		    }
+		};
+		PaintDrawable p = new PaintDrawable();
+		p.setShape(new RectShape());
+		p.setShaderFactory(sf);
+		shape.setBackground((Drawable)p);*/
 	}
+	
+	private static Shader makeLinear(int color, int height) {
+           return new LinearGradient(0, 0, 0, height,
+                           new int[] { 0xFFFF0000, color, 0xFF0000FF },
+                           new float[] { 0, 0.45f, 1 },
+                           Shader.TileMode.REPEAT);
+   }
 
 	protected void onDraw(Canvas canvas) {
 		super.onDraw(canvas);
@@ -185,11 +220,20 @@ public class BoardDrawableView extends View {
                     int range[] = maxRange(bounds);
                     switch (event.getAction()) {
                     case MotionEvent.ACTION_DOWN:
-                    //	v.vibrate(50); //vibrates when blocks are pressed
+                   // 	v.vibrate(50); //vibrates when blocks are pressed
                             if (bounds != null) {
                                     //        Rect rect = new Rect();
                                     //        rect.set(bounds.getBounds().left, bounds.getBounds().top,
                                     //                        bounds.getBounds().right, bounds.getBounds().bottom);
+                                if (bounds.getPaint().getColor() == 0xffCC0000) {
+                                	isSolved = isSolved(bounds);
+                                	if(isSolved){
+                                		puzzleId = puzzleId + 1;
+                                		setUp(puzzleId);
+                                		invalidate();
+                                		return true;
+                                	}
+                                }
                                     moving = (bounds.getBounds().intersects(x, y, x + 1, y + 1));
                                     invalidate();
                                     
@@ -226,54 +270,54 @@ public class BoardDrawableView extends View {
                                                     boolean onlyD = false;
                                             
                                                     if(horizontal(bounds)){
-                                                            System.out.println(range[0] +" , "+ range[1]);
-                                                            if(((x_new - width/2) > (x_new - width/2- range[0])) && ((x_new + width/2) <(x_new + width/2 + range[1])) && !onlyR && !onlyL && !onlyU && !onlyD){
+                                                       //     System.out.println(range[0] +" , "+ range[1]);
+                                                     //       if(((x_new - width/2) > (x_new - width/2- range[0])) && ((x_new + width/2) <(x_new + width/2 + range[1])) && !onlyR && !onlyL && !onlyU && !onlyD){
                                                                     bounds.setBounds(x_new - width/2,
                                                                                     old_top,
                                                                                     x_new + width/2,
                                                                                     old_bottom);
                                                                     invalidate();
-                                                            } if ((range[0]<=0) && (x_new > bounds.getBounds().centerX()))  {
-                                                                    bounds.setBounds(x_new - width/2,
-                                                                                    old_top,
-                                                                                    x_new + width/2,
-                                                                                    old_bottom);
-                                                                    invalidate();
-                                                                    return true;
-                                                            } else if((range[1]<=0) && (x_new < bounds.getBounds().centerX())){
-                                                                    bounds.setBounds(x_new - width/2,
-                                                                                    old_top,
-                                                                                    x_new + width/2,
-                                                                                    old_bottom);
-                                                                    invalidate();
-                                                                    return true;
-
-                                                            }
+//                                                            } if ((range[0]<=0) && (x_new > bounds.getBounds().centerX()))  {
+//                                                                    bounds.setBounds(x_new - width/2,
+//                                                                                    old_top,
+//                                                                                    x_new + width/2,
+//                                                                                    old_bottom);
+//                                                                    invalidate();
+//                                                                    return true;
+//                                                            } else if((range[1]<=0) && (x_new < bounds.getBounds().centerX())){
+//                                                                    bounds.setBounds(x_new - width/2,
+//                                                                                    old_top,
+//                                                                                    x_new + width/2,
+//                                                                                    old_bottom);
+//                                                                    invalidate();
+//                                                                    return true;
+//
+//                                                            }
                                                     }else{
-                                                            System.out.println(range[0] +" , "+ range[1]);
-                                                            if((y_new - height/2 > y_new - height/2 - range[0]) &&(y_new + height/2<  y_new + height/2 + range[1])){
+                                                           // System.out.println(range[0] +" , "+ range[1]);
+                                                         //   if((y_new - height/2 > y_new - height/2 - range[0]) &&(y_new + height/2<  y_new + height/2 + range[1])){
                                                                     bounds.setBounds(old_left,
                                                                                     y_new - height/2, 
                                                                                     old_right, 
                                                                                     y_new+ height/2);
                                                                     invalidate();
-                                                            }
-                                                            else if((range[0]<=0) && (y_new > bounds.getBounds().centerY())){
-                                                                    bounds.setBounds(old_left,
-                                                                                    y_new - height/2, 
-                                                                                    old_right, 
-                                                                                    y_new+ height/2);
-                                                                    invalidate();
-                                                                    return true;
-
-                                                            } else if((range[1]<=0) && (y_new < bounds.getBounds().centerY())) {
-                                                                    bounds.setBounds(old_left,
-                                                                                    y_new - height/2, 
-                                                                                    old_right, 
-                                                                                    y_new+ height/2);
-                                                                    invalidate();
-                                                                    return true;
-                                                            }
+//                                                            }
+//                                                            else if((range[0]<=0) && (y_new > bounds.getBounds().centerY())){
+//                                                                    bounds.setBounds(old_left,
+//                                                                                    y_new - height/2, 
+//                                                                                    old_right, 
+//                                                                                    y_new+ height/2);
+//                                                                    invalidate();
+//                                                                    return true;
+//
+//                                                            } else if((range[1]<=0) && (y_new < bounds.getBounds().centerY())) {
+//                                                                    bounds.setBounds(old_left,
+//                                                                                    y_new - height/2, 
+//                                                                                    old_right, 
+//                                                                                    y_new+ height/2);
+//                                                                    invalidate();
+//                                                                    return true;
+//                                                            }
 
                                                     }
 
